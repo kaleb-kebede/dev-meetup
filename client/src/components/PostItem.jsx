@@ -14,6 +14,14 @@ const PostItem = ({ post, onLike, onCommentAdded, onToggleComments, isCommentsOp
   const [editedImageUrl, setEditedImageUrl] = useState(post.imageUrl || '');
   const [showOptions, setShowOptions] = useState(false);
 
+  // --- FIX: Construct the full image URL ---
+  const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  const getFullImageUrl = (path) => {
+    if (!path) return null;
+    // Remove '/api' if it exists in the base URL, as our static path doesn't use it
+    return `${API_BASE_URL.replace('/api', '')}${path}`;
+  };
+
   const formatDate = (dateString) => {
     const seconds = Math.floor((new Date() - new Date(dateString)) / 1000);
     let interval = seconds / 31536000;
@@ -35,7 +43,6 @@ const PostItem = ({ post, onLike, onCommentAdded, onToggleComments, isCommentsOp
     setIsEditing(false);
   };
 
-  // Placeholder functions for new features
   const handleRepost = () => toast('Repost feature coming soon!');
   const handleSend = () => toast('Send feature coming soon!');
 
@@ -46,7 +53,7 @@ const PostItem = ({ post, onLike, onCommentAdded, onToggleComments, isCommentsOp
         <div className="flex items-center">
           <Link to={`/profile/${post.user.username}`}>
             <img 
-              src={post.user.profileImageUrl || `https://placehold.co/48x48/1f2937/9ca3af?text=${post.user.username.charAt(0)}`}
+              src={getFullImageUrl(post.user.profileImageUrl) || `https://placehold.co/48x48/1f2937/9ca3af?text=${post.user.username.charAt(0)}`}
               alt={`${post.user.username}'s profile`}
               className="w-12 h-12 rounded-full mr-4"
             />
@@ -87,7 +94,7 @@ const PostItem = ({ post, onLike, onCommentAdded, onToggleComments, isCommentsOp
         ) : (
           <>
             <p className="text-gray-200 whitespace-pre-wrap">{post.content}</p>
-            {post.imageUrl && <img src={post.imageUrl} alt="Post content" className="mt-4 rounded-lg w-full object-cover"/>}
+            {post.imageUrl && <img src={getFullImageUrl(post.imageUrl)} alt="Post content" className="mt-4 rounded-lg w-full object-cover"/>}
           </>
         )}
       </div>
@@ -120,7 +127,6 @@ const PostItem = ({ post, onLike, onCommentAdded, onToggleComments, isCommentsOp
           <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
           <span>Comment</span>
         </button>
-        {/* --- NEW BUTTONS --- */}
         <button 
           onClick={handleRepost}
           disabled={!user}
