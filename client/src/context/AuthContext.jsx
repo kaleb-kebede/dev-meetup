@@ -1,40 +1,42 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-// 1. Create the context
 const AuthContext = createContext(null);
 
-// 2. Create the AuthProvider component
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  // 1. Add a loading state, initially true
+  const [loading, setLoading] = useState(true);
 
-  // useEffect runs when the component mounts.
-  // We'll use it to check if user data exists in localStorage.
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
+    try {
+      const storedUser = localStorage.getItem('user');
+      if (storedUser) {
+        setUser(JSON.parse(storedUser));
+      }
+    } catch (error) {
+      // Handle potential parsing errors
+      console.error("Failed to parse user from localStorage", error);
+      localStorage.removeItem('user');
+    } finally {
+      // 2. Set loading to false after we've checked localStorage
+      setLoading(false);
     }
   }, []);
 
-  // Function to handle user login
   const login = (userData) => {
-    // Save user data to localStorage to persist the session
     localStorage.setItem('user', JSON.stringify(userData));
-    // Update the user state
     setUser(userData);
   };
 
-  // Function to handle user logout
   const logout = () => {
-    // Remove user data from localStorage
     localStorage.removeItem('user');
-    // Reset the user state
     setUser(null);
   };
 
-  // The value provided to the context consumers
+  // 3. Provide the loading state to the rest of the app
   const value = {
     user,
+    loading, // Expose the loading state
     login,
     logout,
   };
@@ -42,7 +44,6 @@ export const AuthProvider = ({ children }) => {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-// 3. Create a custom hook for easy access to the context
 export const useAuth = () => {
   return useContext(AuthContext);
 };
