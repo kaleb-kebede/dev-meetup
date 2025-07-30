@@ -4,20 +4,21 @@ import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
 const EditProfilePage = () => {
-  const { user, login } = useAuth(); // Get user and the login function to update context
+  const { user, login } = useAuth();
   const navigate = useNavigate();
   
   const [formData, setFormData] = useState({
     bio: '',
-    skills: '', // We'll handle skills as a comma-separated string
+    skills: '',
+    profileImageUrl: '', // 1. Add new state for the image URL
   });
   
-  // When the component loads, pre-fill the form with the user's current data
   useEffect(() => {
     if (user) {
       setFormData({
         bio: user.bio || '',
         skills: user.skills ? user.skills.join(', ') : '',
+        profileImageUrl: user.profileImageUrl || '', // 2. Pre-fill with existing URL
       });
     }
   }, [user]);
@@ -31,14 +32,24 @@ const EditProfilePage = () => {
     try {
       const updatedData = {
         bio: formData.bio,
-        // Convert the comma-separated string back into an array
         skills: formData.skills.split(',').map(skill => skill.trim()).filter(Boolean),
+        // 3. Include the profile image URL in the data sent to the backend
+        profileImageUrl: formData.profileImageUrl,
       };
 
-      const response = await api.put('/users/profile', updatedData);
+      // We need to call two separate endpoints now
+      // One for text data, one for the image URL
+      const textDataPromise = api.put('/users/profile', { bio: updatedData.bio, skills: updatedData.skills });
+      const imageDataPromise = api.put('/users/profile/picture', { imageUrl: updatedData.profileImageUrl });
+
+      // Wait for both requests to complete
+      const [textResponse, imageResponse] = await Promise.all([textDataPromise, imageDataPromise]);
       
+      // The final user data will come from the last request that updated the user
+      const finalUserData = { ...user, ...textResponse.data, ...imageResponse.data };
+
       // Update the user data in our AuthContext and localStorage
-      login(response.data);
+      login(finalUserData);
 
       // Redirect back to the profile page
       navigate(`/profile/${user.username}`);
@@ -55,6 +66,20 @@ const EditProfilePage = () => {
           Edit Profile
         </h1>
         <form onSubmit={onSubmit}>
+          {/* Profile Image URL Input */}
+          <div className="mb-4">
+            <label htmlFor="profileImageUrl" className="block text-gray-300 mb-2">
+              Profile Picture URL
+            </label>
+            <input
+              type="url"
+              id="profileImageUrl"
+              name="profileImageUrl"
+              value={formData.profileImageUrl}
+              onChange={onChange}
+              className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-cyan-400"
+            />
+          </div>
           <div className="mb-4">
             <label htmlFor="bio" className="block text-gray-300 mb-2">
               Bio

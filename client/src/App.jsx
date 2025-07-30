@@ -4,7 +4,8 @@ import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ProfilePage from './pages/ProfilePage';
-import EditProfilePage from './pages/EditProfilePage'; // 1. Import EditProfilePage
+import EditProfilePage from './pages/EditProfilePage';
+import SearchPage from './pages/SearchPage'; // 1. Import SearchPage
 import { useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -29,6 +30,9 @@ function App() {
                 {location.pathname !== '/' && (
                   <Link to="/" className="hover:text-cyan-400">Home</Link>
                 )}
+                {/* 2. Add a link to the new Search page */}
+                <Link to="/search" className="hover:text-cyan-400">Search</Link>
+                
                 {location.pathname !== `/profile/${user.username}` && (
                   <Link to={`/profile/${user.username}`} className="hover:text-cyan-400">
                     Profile
@@ -55,8 +59,9 @@ function App() {
         <Routes>
           <Route path="/" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
           <Route path="/profile/:username" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
-          {/* 2. Add the new route for the edit profile page */}
           <Route path="/profile/edit" element={<ProtectedRoute><EditProfilePage /></ProtectedRoute>} />
+          {/* 3. Add the new route for the search page */}
+          <Route path="/search" element={<ProtectedRoute><SearchPage /></ProtectedRoute>} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
         </Routes>

@@ -1,7 +1,7 @@
 import User from '../models/User.js';
 import Post from '../models/Post.js';
 
-// ... (getUserProfile, followUser, updateUserProfile functions remain the same) ...
+// ... (getUserProfile, followUser, updateUserProfile, searchUsers functions remain the same) ...
 export const getUserProfile = async (req, res) => {
   try {
     const user = await User.findOne({ username: req.params.username });
@@ -102,32 +102,54 @@ export const updateUserProfile = async (req, res) => {
   }
 };
 
-
-// --- NEW: Search Users Function ---
-// @desc    Search for users by username
-// @route   GET /api/users/search?q=...
-// @access  Private
 export const searchUsers = async (req, res) => {
   try {
-    // Get the search query from the URL query parameters (e.g., ?q=test)
     const searchQuery = req.query.q;
 
     if (!searchQuery) {
       return res.status(400).json({ message: 'Search query is required' });
     }
 
-    // Create a case-insensitive regular expression for the search
     const searchRegex = new RegExp(searchQuery, 'i');
 
-    // Find users whose username matches the search query
-    // We also exclude the current user from the search results
     const users = await User.find({ 
       username: searchRegex,
-      _id: { $ne: req.user.id } // $ne means "not equal to"
-    }).select('username profileImageUrl'); // Only select the fields we need
+      _id: { $ne: req.user.id }
+    }).select('username profileImageUrl');
 
     res.status(200).json(users);
 
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+};
+
+
+// --- NEW: Update Profile Picture Function ---
+// @desc    Update user profile picture URL
+// @route   PUT /api/users/profile/picture
+// @access  Private
+export const updateProfilePicture = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+
+    if (user) {
+      // Get the image URL from the request body
+      user.profileImageUrl = req.body.imageUrl || user.profileImageUrl;
+
+      const updatedUser = await user.save();
+
+      // Send back the relevant parts of the updated user
+      res.json({
+        _id: updatedUser._id,
+        username: updatedUser.username,
+        email: updatedUser.email,
+        profileImageUrl: updatedUser.profileImageUrl,
+      });
+    } else {
+      res.status(404).json({ message: 'User not found' });
+    }
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server Error' });
