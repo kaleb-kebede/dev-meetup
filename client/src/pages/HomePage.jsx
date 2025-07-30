@@ -3,7 +3,7 @@ import api from '../services/api';
 import toast from 'react-hot-toast';
 import CreatePostForm from '../components/CreatePostForm';
 import PostItem from '../components/PostItem';
-import Spinner from '../components/Spinner'; // 1. Import the Spinner component
+import Spinner from '../components/Spinner';
 import { useAuth } from '../context/AuthContext';
 
 const HomePage = () => {
@@ -38,7 +38,7 @@ const HomePage = () => {
 
   const handleLike = async (postId) => {
     try {
-      const response = await api.put(`/posts/${postId}`);
+      const response = await api.patch(`/posts/${postId}`);
       const updatedPost = response.data;
       setPosts(posts.map(post => 
         post._id === postId ? { ...post, likes: updatedPost.likes } : post
@@ -67,6 +67,25 @@ const HomePage = () => {
     }
   };
 
+  // 1. This function will be called by the PostItem component
+  const handleUpdate = async (postId, updatedData) => {
+    try {
+      // 2. Make the API call to our new 'update' endpoint
+      const response = await api.put(`/posts/${postId}`, updatedData);
+      const updatedPost = response.data;
+
+      // 3. Update the 'posts' state to reflect the change in real-time
+      setPosts(posts.map(post => 
+        post._id === postId ? updatedPost : post
+      ));
+      
+      toast.success('Post updated successfully!');
+    } catch (error) {
+      toast.error('Failed to update post.');
+      console.error('Failed to update post:', error);
+    }
+  };
+
   return (
     <div className="container mx-auto p-4 md:p-8">
       {user && <CreatePostForm onPostCreated={handlePostCreated} />}
@@ -88,7 +107,7 @@ const HomePage = () => {
 
       <div className="space-y-6">
         {loading ? (
-          <Spinner /> // 2. Use the Spinner component here
+          <Spinner />
         ) : posts.length === 0 ? (
           <p className="text-gray-400">
             {feedType === 'following' ? "You're not following anyone yet, or they haven't posted." : "No posts yet. Be the first to share!"}
@@ -103,6 +122,7 @@ const HomePage = () => {
               onToggleComments={handleToggleComments}
               isCommentsOpen={openCommentPostId === post._id}
               onDelete={handleDelete}
+              onUpdate={handleUpdate} // 4. Pass the handleUpdate function as a prop
             />
           ))
         )}

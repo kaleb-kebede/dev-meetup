@@ -10,7 +10,8 @@ import {
     addComment,
     getCommentsForPost,
     getFollowingFeed,
-    deletePost // 1. Import the new deletePost function
+    deletePost,
+    updatePost // 1. Import the new updatePost function
 } from '../controllers/postController.js';
 
 // --- Personalized Feed Route ---
@@ -22,10 +23,11 @@ router.route('/')
   .post(protect, createPost)
   .get(getAllPosts);
 
-// --- Like, Comment, and Delete Routes for a specific post ---
+// --- Like, Comment, Delete, and EDIT Routes for a specific post ---
 router.route('/:id')
-  .delete(protect, deletePost) // 2. Add the DELETE route
-  .put(protect, likePost);     // Refactored likePost to use /:id
+  .delete(protect, deletePost)
+  .put(protect, updatePost) // 2. Add the PUT route for editing
+  .patch(protect, likePost); // Changed like to PATCH for semantic correctness
 
 // --- Comment Routes ---
 router.route('/:postId/comments')

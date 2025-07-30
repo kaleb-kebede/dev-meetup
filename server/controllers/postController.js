@@ -2,30 +2,17 @@ import Post from '../models/Post.js';
 import User from '../models/User.js';
 import Comment from '../models/Comment.js';
 
-// @desc    Create a new post
-// @route   POST /api/posts
-// @access  Private
+// ... (createPost, getAllPosts, likePost, addComment, getCommentsForPost, getFollowingFeed, deletePost functions remain the same) ...
+
 export const createPost = async (req, res) => {
   try {
-    // 1. Destructure both content and imageUrl from the request body
     const { content, imageUrl } = req.body;
-
     if (!content) {
       return res.status(400).json({ message: 'Post content cannot be empty' });
     }
-
-    // 2. Include the imageUrl when creating the new post
-    const newPost = new Post({
-      content,
-      imageUrl, // Add the imageUrl here
-      user: req.user.id,
-    });
-
+    const newPost = new Post({ content, imageUrl, user: req.user.id });
     const savedPost = await newPost.save();
-
-    // Populate the user data before sending the response
     const populatedPost = await Post.findById(savedPost._id).populate('user', 'username profileImageUrl');
-
     res.status(201).json(populatedPost);
   } catch (error) {
     console.error(error);
@@ -33,7 +20,6 @@ export const createPost = async (req, res) => {
   }
 };
 
-// ... (getAllPosts, likePost, addComment, getCommentsForPost, getFollowingFeed, deletePost functions remain the same) ...
 export const getAllPosts = async (req, res) => {
   try {
     const posts = await Post.find({}).sort({ createdAt: -1 }).populate('user', 'username profileImageUrl');
@@ -114,19 +100,48 @@ export const getFollowingFeed = async (req, res) => {
 export const deletePost = async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
+    if (!post) {
+      return res.status(404).json({ message: 'Post not found' });
+    }
+    if (post.user.toString() !== req.user.id) {
+      return res.status(401).json({ message: 'User not authorized' });
+    }
+    await Comment.deleteMany({ post: req.params.id });
+    await Post.findByIdAndDelete(req.params.id);
+    res.status(200).json({ message: 'Post removed successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+};
+
+// --- NEW: Update Post Function ---
+// @desc    Update a post
+// @route   PUT /api/posts/:id
+// @access  Private
+export const updatePost = async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
 
     if (!post) {
       return res.status(404).json({ message: 'Post not found' });
     }
 
+    // Check if the logged-in user is the author of the post
     if (post.user.toString() !== req.user.id) {
       return res.status(401).json({ message: 'User not authorized' });
     }
 
-    await Comment.deleteMany({ post: req.params.id });
-    await Post.findByIdAndDelete(req.params.id);
+    // Update the fields from the request body
+    post.content = req.body.content || post.content;
+    post.imageUrl = req.body.imageUrl || post.imageUrl;
 
-    res.status(200).json({ message: 'Post removed successfully' });
+    const updatedPost = await post.save();
+    
+    // Populate user data before sending back
+    const populatedPost = await Post.findById(updatedPost._id).populate('user', 'username profileImageUrl');
+
+    res.status(200).json(populatedPost);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server Error' });
