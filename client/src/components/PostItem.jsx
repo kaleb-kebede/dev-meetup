@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import CommentSection from './CommentSection';
+import toast from 'react-hot-toast';
 
 const PostItem = ({ post, onLike, onCommentAdded, onToggleComments, isCommentsOpen, onDelete, onUpdate }) => {
   const { user } = useAuth();
@@ -11,7 +12,7 @@ const PostItem = ({ post, onLike, onCommentAdded, onToggleComments, isCommentsOp
   const [isEditing, setIsEditing] = useState(false);
   const [editedContent, setEditedContent] = useState(post.content);
   const [editedImageUrl, setEditedImageUrl] = useState(post.imageUrl || '');
-  const [showOptions, setShowOptions] = useState(false); // For the '...' menu
+  const [showOptions, setShowOptions] = useState(false);
 
   const formatDate = (dateString) => {
     const seconds = Math.floor((new Date() - new Date(dateString)) / 1000);
@@ -33,6 +34,10 @@ const PostItem = ({ post, onLike, onCommentAdded, onToggleComments, isCommentsOp
     onUpdate(post._id, { content: editedContent, imageUrl: editedImageUrl });
     setIsEditing(false);
   };
+
+  // Placeholder functions for new features
+  const handleRepost = () => toast('Repost feature coming soon!');
+  const handleSend = () => toast('Send feature coming soon!');
 
   return (
     <div className="bg-gray-800 rounded-lg shadow-lg overflow-hidden">
@@ -114,6 +119,23 @@ const PostItem = ({ post, onLike, onCommentAdded, onToggleComments, isCommentsOp
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
           <span>Comment</span>
+        </button>
+        {/* --- NEW BUTTONS --- */}
+        <button 
+          onClick={handleRepost}
+          disabled={!user}
+          className="flex items-center space-x-2 p-2 rounded-md text-gray-400 hover:bg-gray-700 transition-colors duration-200 w-full justify-center"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h5M20 20v-5h-5M4 20h5v-5M20 4h-5v5" /></svg>
+          <span>Repost</span>
+        </button>
+        <button 
+          onClick={handleSend}
+          disabled={!user}
+          className="flex items-center space-x-2 p-2 rounded-md text-gray-400 hover:bg-gray-700 transition-colors duration-200 w-full justify-center"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
+          <span>Send</span>
         </button>
       </div>
 
