@@ -2,23 +2,38 @@ import Post from '../models/Post.js';
 import User from '../models/User.js';
 import Comment from '../models/Comment.js';
 
-// ... (createPost, getAllPosts, likePost, addComment, getCommentsForPost, getFollowingFeed functions remain the same) ...
-
+// @desc    Create a new post
+// @route   POST /api/posts
+// @access  Private
 export const createPost = async (req, res) => {
   try {
-    const { content } = req.body;
+    // 1. Destructure both content and imageUrl from the request body
+    const { content, imageUrl } = req.body;
+
     if (!content) {
       return res.status(400).json({ message: 'Post content cannot be empty' });
     }
-    const newPost = new Post({ content, user: req.user.id });
+
+    // 2. Include the imageUrl when creating the new post
+    const newPost = new Post({
+      content,
+      imageUrl, // Add the imageUrl here
+      user: req.user.id,
+    });
+
     const savedPost = await newPost.save();
-    res.status(201).json(savedPost);
+
+    // Populate the user data before sending the response
+    const populatedPost = await Post.findById(savedPost._id).populate('user', 'username profileImageUrl');
+
+    res.status(201).json(populatedPost);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server Error' });
   }
 };
 
+// ... (getAllPosts, likePost, addComment, getCommentsForPost, getFollowingFeed, deletePost functions remain the same) ...
 export const getAllPosts = async (req, res) => {
   try {
     const posts = await Post.find({}).sort({ createdAt: -1 }).populate('user', 'username profileImageUrl');
@@ -96,11 +111,6 @@ export const getFollowingFeed = async (req, res) => {
   }
 };
 
-
-// --- NEW: Delete Post Function ---
-// @desc    Delete a post
-// @route   DELETE /api/posts/:id
-// @access  Private
 export const deletePost = async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
@@ -109,15 +119,11 @@ export const deletePost = async (req, res) => {
       return res.status(404).json({ message: 'Post not found' });
     }
 
-    // Check if the logged-in user is the author of the post
     if (post.user.toString() !== req.user.id) {
       return res.status(401).json({ message: 'User not authorized' });
     }
 
-    // Also delete all comments associated with the post
     await Comment.deleteMany({ post: req.params.id });
-
-    // Use findByIdAndDelete to find and remove the post
     await Post.findByIdAndDelete(req.params.id);
 
     res.status(200).json({ message: 'Post removed successfully' });

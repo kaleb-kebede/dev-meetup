@@ -3,12 +3,9 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import CommentSection from './CommentSection';
 
-// 1. Accept a new prop: onDelete
 const PostItem = ({ post, onLike, onCommentAdded, onToggleComments, isCommentsOpen, onDelete }) => {
   const { user } = useAuth();
   const isLikedByCurrentUser = user && post.likes.includes(user._id);
-  
-  // 2. Check if the current user is the author of the post
   const isAuthor = user && user._id === post.user._id;
 
   const formatDate = (dateString) => {
@@ -23,7 +20,6 @@ const PostItem = ({ post, onLike, onCommentAdded, onToggleComments, isCommentsOp
   };
   
   const handleDeleteClick = () => {
-    // We'll add a confirmation dialog here for better UX
     if (window.confirm('Are you sure you want to delete this post?')) {
       onDelete(post._id);
     }
@@ -45,19 +41,31 @@ const PostItem = ({ post, onLike, onCommentAdded, onToggleComments, isCommentsOp
             <p className="text-sm text-gray-400">{formatDate(post.createdAt)}</p>
           </div>
         </div>
-        {/* 3. Conditionally render the delete button */}
         {isAuthor && (
           <button 
             onClick={handleDeleteClick}
             className="text-gray-400 hover:text-red-500 transition-colors duration-200"
             title="Delete post"
           >
-            {/* Using a simple 'X' for the delete icon */}
             &#x2715;
           </button>
         )}
       </div>
-      <p className="text-gray-200 mb-4">{post.content}</p>
+      
+      {/* Post Content and Image */}
+      <div className="mb-4">
+        <p className="text-gray-200">{post.content}</p>
+        {/* 1. Conditionally render the image if an imageUrl exists */}
+        {post.imageUrl && (
+          <img 
+            src={post.imageUrl}
+            alt="Post content"
+            className="mt-4 rounded-lg w-full object-cover"
+          />
+        )}
+      </div>
+
+      {/* Post Actions */}
       <div className="flex items-center text-gray-400 space-x-4">
         <button 
           onClick={handleLikeClick}

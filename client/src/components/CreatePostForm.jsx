@@ -1,27 +1,35 @@
 import React, { useState } from 'react';
 import api from '../services/api';
+import toast from 'react-hot-toast';
 
-// 1. Accept a new prop called `onPostCreated`
 const CreatePostForm = ({ onPostCreated }) => {
   const [content, setContent] = useState('');
+  const [imageUrl, setImageUrl] = useState(''); // 1. Add new state for the image URL
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    if (!content.trim()) return; // Prevent empty posts
+    if (!content.trim()) {
+      toast.error('Post content cannot be empty.');
+      return;
+    }
 
     try {
-      const postData = { content };
+      // 2. Include both content and imageUrl in the data sent to the backend
+      const postData = { content, imageUrl };
       const response = await api.post('/posts', postData);
 
-      // 2. If the prop exists, call it with the new post data from the backend
       if (onPostCreated) {
         onPostCreated(response.data);
       }
       
-      setContent(''); // Clear the form
+      toast.success('Post created successfully!');
+      setContent(''); // Clear the form fields
+      setImageUrl('');
       
     } catch (error) {
-      console.error('Failed to create post:', error.response?.data?.message || error.message);
+      const message = error.response?.data?.message || 'Failed to create post.';
+      toast.error(message);
+      console.error('Failed to create post:', message);
     }
   };
 
@@ -36,6 +44,14 @@ const CreatePostForm = ({ onPostCreated }) => {
           onChange={(e) => setContent(e.target.value)}
           required
         ></textarea>
+        {/* 3. Add the new input field for the image URL */}
+        <input
+          type="url"
+          className="w-full p-2 mt-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-cyan-400"
+          placeholder="Optional: Image URL (e.g., https://...)"
+          value={imageUrl}
+          onChange={(e) => setImageUrl(e.target.value)}
+        />
         <div className="flex justify-end mt-4">
           <button
             type="submit"
