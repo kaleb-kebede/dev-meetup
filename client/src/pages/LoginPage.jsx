@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
-import { useAuth } from '../context/AuthContext'; // 1. Import useAuth
+import { useAuth } from '../context/AuthContext';
+import toast from 'react-hot-toast'; // 1. Import toast
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const navigate = useNavigate();
-  const { login } = useAuth(); // 2. Get the login function from our context
+  const { login } = useAuth();
 
   const { email, password } = formData;
 
@@ -21,17 +22,19 @@ const LoginPage = () => {
       };
 
       const response = await api.post('/auth/login', userData);
-
-      // 3. Call the login function with the response data
-      login(response.data);
-
-      console.log('Successfully logged in:', response.data);
       
-      // Redirect to the home page on success
+      login(response.data);
+      
+      // 2. Show a success notification
+      toast.success('Successfully logged in!');
+
       navigate('/');
 
     } catch (error) {
-      console.error('Login failed:', error.response.data.message);
+      // 3. Show an error notification
+      const message = error.response?.data?.message || 'Login failed. Please try again.';
+      toast.error(message);
+      console.error('Login failed:', message);
     }
   };
 

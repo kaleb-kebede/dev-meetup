@@ -1,6 +1,6 @@
-import axios from 'axios';
+import axios from "axios";
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 const api = axios.create({
   baseURL: API_URL,
@@ -11,13 +11,13 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     // 1. Get the user data from localStorage.
-    const user = JSON.parse(localStorage.getItem('user'));
+    const user = JSON.parse(localStorage.getItem("user"));
 
     // 2. If the user and their token exist...
     if (user && user.token) {
       // 3. ...add an 'Authorization' header to the request.
       // The format "Bearer [token]" is a standard convention.
-      config.headers['Authorization'] = `Bearer ${user.token}`;
+      config.headers["Authorization"] = `Bearer ${user.token}`;
     }
 
     // 4. Return the modified request configuration.

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import toast from 'react-hot-toast'; // 1. Import toast
 
 const EditProfilePage = () => {
   const { user, login } = useAuth();
@@ -10,7 +11,7 @@ const EditProfilePage = () => {
   const [formData, setFormData] = useState({
     bio: '',
     skills: '',
-    profileImageUrl: '', // 1. Add new state for the image URL
+    profileImageUrl: '',
   });
   
   useEffect(() => {
@@ -18,7 +19,7 @@ const EditProfilePage = () => {
       setFormData({
         bio: user.bio || '',
         skills: user.skills ? user.skills.join(', ') : '',
-        profileImageUrl: user.profileImageUrl || '', // 2. Pre-fill with existing URL
+        profileImageUrl: user.profileImageUrl || '',
       });
     }
   }, [user]);
@@ -33,28 +34,27 @@ const EditProfilePage = () => {
       const updatedData = {
         bio: formData.bio,
         skills: formData.skills.split(',').map(skill => skill.trim()).filter(Boolean),
-        // 3. Include the profile image URL in the data sent to the backend
         profileImageUrl: formData.profileImageUrl,
       };
 
-      // We need to call two separate endpoints now
-      // One for text data, one for the image URL
       const textDataPromise = api.put('/users/profile', { bio: updatedData.bio, skills: updatedData.skills });
       const imageDataPromise = api.put('/users/profile/picture', { imageUrl: updatedData.profileImageUrl });
 
-      // Wait for both requests to complete
       const [textResponse, imageResponse] = await Promise.all([textDataPromise, imageDataPromise]);
       
-      // The final user data will come from the last request that updated the user
       const finalUserData = { ...user, ...textResponse.data, ...imageResponse.data };
 
-      // Update the user data in our AuthContext and localStorage
       login(finalUserData);
 
-      // Redirect back to the profile page
+      // 2. Show a success notification
+      toast.success('Profile updated successfully!');
+
       navigate(`/profile/${user.username}`);
 
     } catch (error) {
+      // 3. Show an error notification
+      const message = error.response?.data?.message || 'Failed to update profile.';
+      toast.error(message);
       console.error('Failed to update profile:', error);
     }
   };
@@ -66,7 +66,6 @@ const EditProfilePage = () => {
           Edit Profile
         </h1>
         <form onSubmit={onSubmit}>
-          {/* Profile Image URL Input */}
           <div className="mb-4">
             <label htmlFor="profileImageUrl" className="block text-gray-300 mb-2">
               Profile Picture URL

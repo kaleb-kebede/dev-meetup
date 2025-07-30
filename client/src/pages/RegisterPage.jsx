@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import api from '../services/api'; // Import our api service
+import api from '../services/api';
+import toast from 'react-hot-toast'; // 1. Import toast
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({
@@ -9,7 +10,7 @@ const RegisterPage = () => {
     password: '',
     password2: '',
   });
-  const navigate = useNavigate(); // Hook to redirect the user
+  const navigate = useNavigate();
 
   const { username, email, password, password2 } = formData;
 
@@ -23,29 +24,28 @@ const RegisterPage = () => {
   const onSubmit = async (e) => {
     e.preventDefault();
     if (password !== password2) {
-      console.log('Passwords do not match');
-      // We will add a user-friendly notification here later
+      // 2. Show an error toast if passwords don't match
+      toast.error('Passwords do not match');
     } else {
       try {
-        // Prepare the data to send to the backend
         const userData = {
           username,
           email,
           password,
         };
 
-        // Make the API call to the register endpoint
-        const response = await api.post('/auth/register', userData);
+        await api.post('/auth/register', userData);
 
-        console.log('Successfully registered:', response.data);
+        // 3. Show a success toast
+        toast.success('Successfully registered! Please log in.');
         
-        // We can handle the response here, e.g., save the token
-        // and redirect the user to the login page.
         navigate('/login');
 
       } catch (error) {
-        // Log any errors from the backend
-        console.error('Registration failed:', error.response.data.message);
+        // 4. Show an error toast from the backend
+        const message = error.response?.data?.message || 'Registration failed. Please try again.';
+        toast.error(message);
+        console.error('Registration failed:', message);
       }
     }
   };
