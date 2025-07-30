@@ -1,32 +1,35 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
-const CommentSchema = new mongoose.Schema(
-  {
-    // Link to the post this comment belongs to
-    post: {
-      type: mongoose.Schema.Types.ObjectId,
-      required: true,
-      ref: "Post",
-    },
-    // Link to the user who wrote the comment
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
-      required: true,
-      ref: "User",
-    },
-    // The actual text content of the comment
-    content: {
-      type: String,
-      required: [true, "Please add some content to your comment"],
-      trim: true,
-    },
+const CommentSchema = new mongoose.Schema({
+  post: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: 'Post',
   },
-  {
-    // Automatically add `createdAt` and `updatedAt` fields
-    timestamps: true,
-  }
-);
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: 'User',
+  },
+  content: {
+    type: String,
+    required: [true, 'Please add some content to your comment'],
+    trim: true,
+  },
+  // --- NEW FIELDS FOR REPLIES ---
+  parentComment: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Comment',
+    default: null, // Top-level comments will have this as null
+  },
+  replies: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Comment'
+  }],
+}, {
+  timestamps: true,
+});
 
-const Comment = mongoose.model("Comment", CommentSchema);
+const Comment = mongoose.model('Comment', CommentSchema);
 
 export default Comment;
