@@ -3,6 +3,7 @@ import api from '../services/api';
 import toast from 'react-hot-toast';
 import CreatePostForm from '../components/CreatePostForm';
 import PostItem from '../components/PostItem';
+import Spinner from '../components/Spinner'; // 1. Import the Spinner component
 import { useAuth } from '../context/AuthContext';
 
 const HomePage = () => {
@@ -55,15 +56,10 @@ const HomePage = () => {
     setOpenCommentPostId(prevId => (prevId === postId ? null : postId));
   };
 
-  // 1. This function will be called by the PostItem component
   const handleDelete = async (postId) => {
     try {
-      // 2. Make the API call to our new 'delete' endpoint
       await api.delete(`/posts/${postId}`);
-      
-      // 3. Update the 'posts' state to remove the deleted post in real-time
       setPosts(posts.filter(post => post._id !== postId));
-      
       toast.success('Post deleted successfully!');
     } catch (error) {
       toast.error('Failed to delete post.');
@@ -92,7 +88,7 @@ const HomePage = () => {
 
       <div className="space-y-6">
         {loading ? (
-          <p className="text-gray-400">Loading feed...</p>
+          <Spinner /> // 2. Use the Spinner component here
         ) : posts.length === 0 ? (
           <p className="text-gray-400">
             {feedType === 'following' ? "You're not following anyone yet, or they haven't posted." : "No posts yet. Be the first to share!"}
@@ -106,7 +102,7 @@ const HomePage = () => {
               onCommentAdded={() => handleCommentAdded(post._id)}
               onToggleComments={handleToggleComments}
               isCommentsOpen={openCommentPostId === post._id}
-              onDelete={handleDelete} // 4. Pass the handleDelete function as a prop
+              onDelete={handleDelete}
             />
           ))
         )}
