@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import api from '../services/api';
+import toast from 'react-hot-toast';
 import CreatePostForm from '../components/CreatePostForm';
 import PostItem from '../components/PostItem';
 import { useAuth } from '../context/AuthContext';
@@ -9,10 +10,8 @@ const HomePage = () => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [openCommentPostId, setOpenCommentPostId] = useState(null);
-  // 1. New state to track the current feed type ('following' or 'global')
   const [feedType, setFeedType] = useState('following');
 
-  // 2. Update fetchPosts to get data based on the selected feed type
   const fetchPosts = useCallback(async () => {
     const url = feedType === 'following' ? '/posts/feed' : '/posts';
     try {
@@ -21,7 +20,7 @@ const HomePage = () => {
     } catch (error) {
       console.error(`Failed to fetch ${feedType} feed:`, error);
     }
-  }, [feedType]); // Rerun this function if feedType changes
+  }, [feedType]);
 
   useEffect(() => {
     const initialFetch = async () => {
@@ -30,7 +29,7 @@ const HomePage = () => {
       setLoading(false);
     };
     initialFetch();
-  }, [fetchPosts]); // Rerun when fetchPosts function updates (i.e., when feedType changes)
+  }, [fetchPosts]);
 
   const handlePostCreated = (newPost) => {
     fetchPosts();
@@ -38,7 +37,7 @@ const HomePage = () => {
 
   const handleLike = async (postId) => {
     try {
-      const response = await api.put(`/posts/${postId}/like`);
+      const response = await api.put(`/posts/${postId}`);
       const updatedPost = response.data;
       setPosts(posts.map(post => 
         post._id === postId ? { ...post, likes: updatedPost.likes } : post
@@ -56,11 +55,26 @@ const HomePage = () => {
     setOpenCommentPostId(prevId => (prevId === postId ? null : postId));
   };
 
+  // 1. This function will be called by the PostItem component
+  const handleDelete = async (postId) => {
+    try {
+      // 2. Make the API call to our new 'delete' endpoint
+      await api.delete(`/posts/${postId}`);
+      
+      // 3. Update the 'posts' state to remove the deleted post in real-time
+      setPosts(posts.filter(post => post._id !== postId));
+      
+      toast.success('Post deleted successfully!');
+    } catch (error) {
+      toast.error('Failed to delete post.');
+      console.error('Failed to delete post:', error);
+    }
+  };
+
   return (
     <div className="container mx-auto p-4 md:p-8">
       {user && <CreatePostForm onPostCreated={handlePostCreated} />}
       
-      {/* 3. Feed Toggle UI */}
       <div className="mt-8 mb-4 flex border-b-2 border-gray-700">
         <button 
           onClick={() => setFeedType('following')}
@@ -92,6 +106,7 @@ const HomePage = () => {
               onCommentAdded={() => handleCommentAdded(post._id)}
               onToggleComments={handleToggleComments}
               isCommentsOpen={openCommentPostId === post._id}
+              onDelete={handleDelete} // 4. Pass the handleDelete function as a prop
             />
           ))
         )}

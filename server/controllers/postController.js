@@ -2,9 +2,8 @@ import Post from '../models/Post.js';
 import User from '../models/User.js';
 import Comment from '../models/Comment.js';
 
-// ... (createPost, getAllPosts, likePost, addComment, getCommentsForPost functions remain the same) ...
+// ... (createPost, getAllPosts, likePost, addComment, getCommentsForPost, getFollowingFeed functions remain the same) ...
 
-// @desc    Create a new post
 export const createPost = async (req, res) => {
   try {
     const { content } = req.body;
@@ -20,7 +19,6 @@ export const createPost = async (req, res) => {
   }
 };
 
-// @desc    Get all posts (the public feed)
 export const getAllPosts = async (req, res) => {
   try {
     const posts = await Post.find({}).sort({ createdAt: -1 }).populate('user', 'username profileImageUrl');
@@ -31,7 +29,6 @@ export const getAllPosts = async (req, res) => {
   }
 };
 
-// @desc    Like or unlike a post
 export const likePost = async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
@@ -53,7 +50,6 @@ export const likePost = async (req, res) => {
   }
 };
 
-// @desc    Add a comment to a post
 export const addComment = async (req, res) => {
   try {
     const { content } = req.body;
@@ -76,7 +72,6 @@ export const addComment = async (req, res) => {
   }
 };
 
-// @desc    Get all comments for a post
 export const getCommentsForPost = async (req, res) => {
   try {
     const comments = await Comment.find({ post: req.params.postId }).sort({ createdAt: 'asc' }).populate('user', 'username profileImageUrl');
@@ -87,26 +82,45 @@ export const getCommentsForPost = async (req, res) => {
   }
 };
 
-
-// --- NEW FEED FUNCTION ---
-
-// @desc    Get posts from users the current user is following
-// @route   GET /api/posts/feed
-// @access  Private
 export const getFollowingFeed = async (req, res) => {
   try {
-    // 1. Get the currently logged-in user from the 'protect' middleware
     const currentUser = await User.findById(req.user.id);
-
-    // 2. Get the list of user IDs that the current user is following
     const followingIds = currentUser.following;
-
-    // 3. Find all posts where the 'user' field is in the 'followingIds' array
     const feedPosts = await Post.find({ user: { $in: followingIds } })
       .sort({ createdAt: -1 })
       .populate('user', 'username profileImageUrl');
-
     res.status(200).json(feedPosts);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+};
+
+
+// --- NEW: Delete Post Function ---
+// @desc    Delete a post
+// @route   DELETE /api/posts/:id
+// @access  Private
+export const deletePost = async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+
+    if (!post) {
+      return res.status(404).json({ message: 'Post not found' });
+    }
+
+    // Check if the logged-in user is the author of the post
+    if (post.user.toString() !== req.user.id) {
+      return res.status(401).json({ message: 'User not authorized' });
+    }
+
+    // Also delete all comments associated with the post
+    await Comment.deleteMany({ post: req.params.id });
+
+    // Use findByIdAndDelete to find and remove the post
+    await Post.findByIdAndDelete(req.params.id);
+
+    res.status(200).json({ message: 'Post removed successfully' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server Error' });
