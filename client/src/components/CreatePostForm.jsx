@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
 import api from '../services/api';
 import toast from 'react-hot-toast';
+import { useAuth } from '../context/AuthContext';
+import Modal from './Modal'; // 1. Import the Modal component
 
-const CreatePostForm = ({ onPostCreated }) => {
+// 2. Accept isOpen and onClose props to control the modal
+const CreatePostForm = ({ onPostCreated, isOpen, onClose }) => {
+  const { user } = useAuth();
   const [content, setContent] = useState('');
-  const [imageFile, setImageFile] = useState(null); // 1. State for the image file
+  const [imageFile, setImageFile] = useState(null);
   const [uploading, setUploading] = useState(false);
 
   const handleFileChange = (e) => {
@@ -22,19 +26,15 @@ const CreatePostForm = ({ onPostCreated }) => {
       setUploading(true);
       let imageUrl = '';
 
-      // 2. If a file was selected, upload it first
       if (imageFile) {
         const uploadFormData = new FormData();
         uploadFormData.append('image', imageFile);
-
         const uploadResponse = await api.post('/upload', uploadFormData, {
           headers: { 'Content-Type': 'multipart/form-data' },
         });
-        
-        imageUrl = uploadResponse.data.image; // Get the new image path
+        imageUrl = uploadResponse.data.image;
       }
 
-      // 3. Create the post with the new image URL
       const postData = { content, imageUrl };
       const response = await api.post('/posts', postData);
 
@@ -43,55 +43,68 @@ const CreatePostForm = ({ onPostCreated }) => {
       }
       
       toast.success('Post created successfully!');
+      // Reset state and close modal
       setContent('');
-      setImageFile(null); // Clear the file input
-      // This is a common trick to reset a file input
-      document.getElementById('postImageFile').value = null;
+      setImageFile(null);
+      onClose();
 
     } catch (error) {
       const message = error.response?.data?.message || 'Failed to create post.';
       toast.error(message);
-      console.error('Failed to create post:', message);
     } finally {
       setUploading(false);
     }
   };
 
   return (
-    <div className="bg-gray-800 p-4 rounded-lg shadow-lg mb-8">
+    // 3. Wrap the entire form in the Modal component
+    <Modal isOpen={isOpen} onClose={onClose}>
+      <div className="flex items-center mb-4">
+        <img 
+          src={user?.profileImageUrl || `https://placehold.co/48x48/1f2937/9ca3af?text=${user?.username.charAt(0)}`} 
+          alt="Your profile" 
+          className="w-12 h-12 rounded-full mr-4"
+        />
+        <div>
+          <p className="font-bold text-white">{user?.username}</p>
+          <p className="text-sm text-gray-400">Post to Anyone</p>
+        </div>
+      </div>
+
       <form onSubmit={onSubmit}>
         <textarea
-          className="w-full p-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
-          rows="3"
-          placeholder="What's on your mind, developer?"
+          className="w-full p-2 bg-transparent text-white text-lg placeholder-gray-400 focus:outline-none"
+          rows="6"
+          placeholder="What do you want to talk about?"
           value={content}
           onChange={(e) => setContent(e.target.value)}
           required
         ></textarea>
         
-        {/* 4. Changed the input from 'url' to 'file' */}
-        <div className="mt-2">
-          <label htmlFor="postImageFile" className="text-sm text-gray-400">Add an image (optional):</label>
-          <input
-            type="file"
-            id="postImageFile"
-            name="imageFile"
-            onChange={handleFileChange}
-            className="w-full mt-1 text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-cyan-50 file:text-cyan-700 hover:file:bg-cyan-100"
-          />
-        </div>
-
-        <div className="flex justify-end mt-4">
+        <div className="flex items-center justify-between mt-4">
+          <div>
+            {/* Placeholder for image icon */}
+            <label htmlFor="postImageFileModal" className="cursor-pointer text-gray-400 hover:text-cyan-400 p-2 rounded-full">
+              📷
+            </label>
+            <input
+              type="file"
+              id="postImageFileModal"
+              className="hidden"
+              onChange={handleFileChange}
+            />
+            {imageFile && <span className="text-sm text-gray-400 ml-2">{imageFile.name}</span>}
+          </div>
           <button
             type="submit"
-            className="bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300"
-            disabled={uploading}
+            className="bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-2 px-6 rounded-full transition duration-300 disabled:bg-gray-600"
+            disabled={uploading || !content.trim()}
           >
             {uploading ? 'Posting...' : 'Post'}
           </button>
         </div>
       </form>
-    </div>
+    </Modal>
   );
 };
 

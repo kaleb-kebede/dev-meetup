@@ -12,6 +12,8 @@ const HomePage = () => {
   const [loading, setLoading] = useState(true);
   const [openCommentPostId, setOpenCommentPostId] = useState(null);
   const [feedType, setFeedType] = useState('following');
+  // 1. New state to control the visibility of the Create Post modal
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const fetchPosts = useCallback(async () => {
     const url = feedType === 'following' ? '/posts/feed' : '/posts';
@@ -67,18 +69,13 @@ const HomePage = () => {
     }
   };
 
-  // 1. This function will be called by the PostItem component
   const handleUpdate = async (postId, updatedData) => {
     try {
-      // 2. Make the API call to our new 'update' endpoint
       const response = await api.put(`/posts/${postId}`, updatedData);
       const updatedPost = response.data;
-
-      // 3. Update the 'posts' state to reflect the change in real-time
       setPosts(posts.map(post => 
         post._id === postId ? updatedPost : post
       ));
-      
       toast.success('Post updated successfully!');
     } catch (error) {
       toast.error('Failed to update post.');
@@ -88,7 +85,29 @@ const HomePage = () => {
 
   return (
     <div className="container mx-auto p-4 md:p-8">
-      {user && <CreatePostForm onPostCreated={handlePostCreated} />}
+      {/* 2. "Start a post" trigger bar */}
+      {user && (
+        <div className="bg-gray-800 p-4 rounded-lg shadow-lg mb-8 flex items-center space-x-4">
+          <img 
+            src={user.profileImageUrl || `https://placehold.co/48x48/1f2937/9ca3af?text=${user.username.charAt(0)}`} 
+            alt="Your profile" 
+            className="w-12 h-12 rounded-full"
+          />
+          <button 
+            onClick={() => setIsModalOpen(true)}
+            className="flex-grow bg-gray-700 hover:bg-gray-600 text-left text-gray-400 px-4 py-3 rounded-full transition-colors duration-200"
+          >
+            Start a post...
+          </button>
+        </div>
+      )}
+
+      {/* 3. The CreatePostForm is now controlled by the modal state */}
+      <CreatePostForm 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        onPostCreated={handlePostCreated} 
+      />
       
       <div className="mt-8 mb-4 flex border-b-2 border-gray-700">
         <button 
@@ -122,7 +141,7 @@ const HomePage = () => {
               onToggleComments={handleToggleComments}
               isCommentsOpen={openCommentPostId === post._id}
               onDelete={handleDelete}
-              onUpdate={handleUpdate} // 4. Pass the handleUpdate function as a prop
+              onUpdate={handleUpdate}
             />
           ))
         )}
