@@ -1,6 +1,6 @@
 import React from 'react';
 import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
-import { Toaster } from 'react-hot-toast'; // 1. Import the Toaster component
+import { Toaster } from 'react-hot-toast';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -9,6 +9,7 @@ import EditProfilePage from './pages/EditProfilePage';
 import SearchPage from './pages/SearchPage';
 import { useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import ThemeToggleButton from './components/ThemeToggleButton';
 
 function App() {
   const { user, logout } = useAuth();
@@ -21,45 +22,43 @@ function App() {
   };
 
   return (
-    <div className="bg-gray-900 min-h-screen text-white flex flex-col">
-      {/* 2. Add the Toaster component here. It can go anywhere in the main div. */}
+    // --- THEME UPDATE ---
+    <div className="bg-gray-100 dark:bg-gray-900 min-h-screen text-gray-900 dark:text-white flex flex-col transition-colors duration-200">
       <Toaster 
         position="top-right"
         toastOptions={{
-          style: {
-            background: '#334155', // bg-slate-700
-            color: '#fff',
-          },
+          className: 'bg-white dark:bg-slate-700 text-gray-900 dark:text-white',
         }}
       />
-      <nav className="bg-gray-800 p-4 shadow-md">
+      <nav className="bg-white dark:bg-gray-800 p-4 shadow-md sticky top-0 z-40">
         <div className="container mx-auto flex justify-between items-center">
-          <Link to="/" className="text-xl font-bold text-cyan-400">Dev Meetup</Link>
+          <Link to="/" className="text-xl font-bold text-cyan-500 dark:text-cyan-400">Dev Meetup</Link>
           <div className="space-x-4 flex items-center">
             {user ? (
               <>
                 {location.pathname !== '/' && (
-                  <Link to="/" className="hover:text-cyan-400">Home</Link>
+                  <Link to="/" className="text-gray-600 dark:text-gray-300 hover:text-cyan-500 dark:hover:text-cyan-400">Home</Link>
                 )}
-                <Link to="/search" className="hover:text-cyan-400">Search</Link>
+                <Link to="/search" className="text-gray-600 dark:text-gray-300 hover:text-cyan-500 dark:hover:text-cyan-400">Search</Link>
                 {location.pathname !== `/profile/${user.username}` && (
-                  <Link to={`/profile/${user.username}`} className="hover:text-cyan-400">
+                  <Link to={`/profile/${user.username}`} className="text-gray-600 dark:text-gray-300 hover:text-cyan-500 dark:hover:text-cyan-400">
                     Profile
                   </Link>
                 )}
                 <button 
                   onClick={handleLogout} 
-                  className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300"
+                  className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg"
                 >
                   Logout
                 </button>
               </>
             ) : (
               <>
-                <Link to="/login" className="hover:text-cyan-400">Login</Link>
-                <Link to="/register" className="hover:text-cyan-400">Register</Link>
+                <Link to="/login" className="text-gray-600 dark:text-gray-300 hover:text-cyan-500 dark:hover:text-cyan-400">Login</Link>
+                <Link to="/register" className="text-gray-600 dark:text-gray-300 hover:text-cyan-500 dark:hover:text-cyan-400">Register</Link>
               </>
             )}
+            <ThemeToggleButton />
           </div>
         </div>
       </nav>

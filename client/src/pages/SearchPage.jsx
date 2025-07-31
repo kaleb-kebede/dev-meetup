@@ -7,9 +7,7 @@ const SearchPage = () => {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // This useEffect hook will run whenever the user stops typing for 300ms
   useEffect(() => {
-    // If the query is empty, clear the results and do nothing
     if (!query.trim()) {
       setResults([]);
       return;
@@ -17,7 +15,6 @@ const SearchPage = () => {
 
     setLoading(true);
 
-    // Set up a timer to delay the API call
     const delayDebounceFn = setTimeout(() => {
       const search = async () => {
         try {
@@ -31,46 +28,44 @@ const SearchPage = () => {
         }
       };
       search();
-    }, 300); // 300ms delay
+    }, 300);
 
-    // Cleanup function: this will clear the timer if the user types again
     return () => clearTimeout(delayDebounceFn);
-  }, [query]); // Rerun the effect whenever the 'query' state changes
+  }, [query]);
 
   return (
     <div className="container mx-auto p-4 md:p-8">
-      <h1 className="text-4xl font-bold text-cyan-400 mb-6">Search Developers</h1>
+      {/* --- THEME UPDATE --- */}
+      <h1 className="text-4xl font-bold text-cyan-500 dark:text-cyan-400 mb-6">Search Developers</h1>
       
-      {/* Search Input Bar */}
       <div className="mb-8">
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search by username..."
-          className="w-full px-4 py-3 bg-gray-800 border-2 border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-cyan-400"
+          className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 dark:focus:ring-cyan-400"
         />
       </div>
 
-      {/* Search Results */}
       <div>
-        {loading && <p className="text-gray-400">Searching...</p>}
+        {loading && <p className="text-gray-500 dark:text-gray-400">Searching...</p>}
         {!loading && results.length === 0 && query.length > 0 && (
-          <p className="text-gray-400">No users found.</p>
+          <p className="text-gray-500 dark:text-gray-400">No users found.</p>
         )}
         <div className="space-y-4">
           {results.map(user => (
             <Link 
               to={`/profile/${user.username}`} 
               key={user._id}
-              className="bg-gray-800 p-4 rounded-lg flex items-center hover:bg-gray-700 transition-colors duration-200"
+              className="bg-white dark:bg-gray-800 p-4 rounded-lg flex items-center hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 shadow"
             >
               <img 
-                src={user.profileImageUrl || `https://placehold.co/40x40/1f2937/9ca3af?text=${user.username.charAt(0)}`}
+                src={user.profileImageUrl || `https://placehold.co/40x40/E2E8F0/475569?text=${user.username.charAt(0)}`}
                 alt={user.username}
                 className="w-10 h-10 rounded-full mr-4"
               />
-              <span className="font-bold text-lg">{user.username}</span>
+              <span className="font-bold text-lg text-gray-800 dark:text-gray-200">{user.username}</span>
             </Link>
           ))}
         </div>

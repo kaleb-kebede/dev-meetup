@@ -4,7 +4,6 @@ const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  // 1. Add a loading state, initially true
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -14,11 +13,9 @@ export const AuthProvider = ({ children }) => {
         setUser(JSON.parse(storedUser));
       }
     } catch (error) {
-      // Handle potential parsing errors
       console.error("Failed to parse user from localStorage", error);
       localStorage.removeItem('user');
     } finally {
-      // 2. Set loading to false after we've checked localStorage
       setLoading(false);
     }
   }, []);
@@ -33,12 +30,22 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
-  // 3. Provide the loading state to the rest of the app
+  // --- NEW: Function to safely update user data ---
+  const updateUser = (updatedData) => {
+    setUser(prevUser => {
+      // Merge previous user data with the new updated data
+      const newUser = { ...prevUser, ...updatedData };
+      localStorage.setItem('user', JSON.stringify(newUser));
+      return newUser;
+    });
+  };
+
   const value = {
     user,
-    loading, // Expose the loading state
+    loading,
     login,
     logout,
+    updateUser, // Expose the new function
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

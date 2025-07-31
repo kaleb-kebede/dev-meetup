@@ -14,11 +14,9 @@ const PostItem = ({ post, onLike, onCommentAdded, onToggleComments, isCommentsOp
   const [editedImageUrl, setEditedImageUrl] = useState(post.imageUrl || '');
   const [showOptions, setShowOptions] = useState(false);
 
-  // --- FIX: Construct the full image URL ---
   const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
   const getFullImageUrl = (path) => {
     if (!path) return null;
-    // Remove '/api' if it exists in the base URL, as our static path doesn't use it
     return `${API_BASE_URL.replace('/api', '')}${path}`;
   };
 
@@ -47,33 +45,34 @@ const PostItem = ({ post, onLike, onCommentAdded, onToggleComments, isCommentsOp
   const handleSend = () => toast('Send feature coming soon!');
 
   return (
-    <div className="bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+    // --- THEME UPDATE ---
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
       {/* Post Header */}
       <div className="p-4 flex items-start justify-between">
         <div className="flex items-center">
           <Link to={`/profile/${post.user.username}`}>
             <img 
-              src={getFullImageUrl(post.user.profileImageUrl) || `https://placehold.co/48x48/1f2937/9ca3af?text=${post.user.username.charAt(0)}`}
+              src={getFullImageUrl(post.user.profileImageUrl) || `https://placehold.co/48x48/E2E8F0/475569?text=${post.user.username.charAt(0)}`}
               alt={`${post.user.username}'s profile`}
               className="w-12 h-12 rounded-full mr-4"
             />
           </Link>
           <div>
-            <Link to={`/profile/${post.user.username}`} className="font-bold text-white hover:underline">
+            <Link to={`/profile/${post.user.username}`} className="font-bold text-gray-900 dark:text-white hover:underline">
               {post.user.username}
             </Link>
-            <p className="text-xs text-gray-400">{formatDate(post.createdAt)} ago</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">{formatDate(post.createdAt)} ago</p>
           </div>
         </div>
         {isAuthor && (
           <div className="relative">
-            <button onClick={() => setShowOptions(!showOptions)} className="text-gray-400 hover:text-white p-2 rounded-full">
+            <button onClick={() => setShowOptions(!showOptions)} className="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white p-2 rounded-full">
               &#x2022;&#x2022;&#x2022;
             </button>
             {showOptions && (
-              <div className="absolute right-0 mt-2 w-48 bg-gray-700 rounded-md shadow-lg z-10">
-                <button onClick={() => { setIsEditing(true); setShowOptions(false); }} className="block w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-gray-600">Edit Post</button>
-                <button onClick={() => { if(window.confirm('Are you sure?')) onDelete(post._id); setShowOptions(false); }} className="block w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-gray-600">Delete Post</button>
+              <div className="absolute right-0 mt-2 w-48 bg-gray-100 dark:bg-gray-700 rounded-md shadow-lg z-10">
+                <button onClick={() => { setIsEditing(true); setShowOptions(false); }} className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600">Edit Post</button>
+                <button onClick={() => { if(window.confirm('Are you sure?')) onDelete(post._id); setShowOptions(false); }} className="block w-full text-left px-4 py-2 text-sm text-red-500 dark:text-red-400 hover:bg-gray-200 dark:hover:bg-gray-600">Delete Post</button>
               </div>
             )}
           </div>
@@ -84,16 +83,16 @@ const PostItem = ({ post, onLike, onCommentAdded, onToggleComments, isCommentsOp
       <div className="px-4 pb-2">
         {isEditing ? (
           <form onSubmit={handleUpdateSubmit}>
-            <textarea value={editedContent} onChange={(e) => setEditedContent(e.target.value)} className="w-full p-2 mb-2 bg-gray-700 rounded-lg text-white" rows="3"/>
-            <input type="url" value={editedImageUrl} onChange={(e) => setEditedImageUrl(e.target.value)} className="w-full p-2 bg-gray-700 rounded-lg text-white" placeholder="Image URL"/>
+            <textarea value={editedContent} onChange={(e) => setEditedContent(e.target.value)} className="w-full p-2 mb-2 bg-gray-100 dark:bg-gray-700 rounded-lg text-gray-900 dark:text-white" rows="3"/>
+            <input type="url" value={editedImageUrl} onChange={(e) => setEditedImageUrl(e.target.value)} className="w-full p-2 bg-gray-100 dark:bg-gray-700 rounded-lg text-gray-900 dark:text-white" placeholder="Image URL"/>
             <div className="flex justify-end mt-2 space-x-2">
-              <button type="button" onClick={() => setIsEditing(false)} className="bg-gray-600 hover:bg-gray-500 text-white font-bold py-1 px-3 rounded-lg">Cancel</button>
+              <button type="button" onClick={() => setIsEditing(false)} className="bg-gray-500 hover:bg-gray-400 text-white font-bold py-1 px-3 rounded-lg">Cancel</button>
               <button type="submit" className="bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-1 px-3 rounded-lg">Save</button>
             </div>
           </form>
         ) : (
           <>
-            <p className="text-gray-200 whitespace-pre-wrap">{post.content}</p>
+            <p className="text-gray-800 dark:text-gray-200 whitespace-pre-wrap">{post.content}</p>
             {post.imageUrl && <img src={getFullImageUrl(post.imageUrl)} alt="Post content" className="mt-4 rounded-lg w-full object-cover"/>}
           </>
         )}
@@ -101,7 +100,7 @@ const PostItem = ({ post, onLike, onCommentAdded, onToggleComments, isCommentsOp
 
       {/* Social Counts */}
       {(post.likes.length > 0 || post.comments.length > 0) && (
-        <div className="px-4 py-2 flex justify-between text-sm text-gray-400">
+        <div className="px-4 py-2 flex justify-between text-sm text-gray-500 dark:text-gray-400">
           <span>{post.likes.length > 0 && `${post.likes.length} Likes`}</span>
           <button onClick={() => onToggleComments(post._id)} className="hover:underline">
             {post.comments.length > 0 && `${post.comments.length} Comments`}
@@ -110,19 +109,19 @@ const PostItem = ({ post, onLike, onCommentAdded, onToggleComments, isCommentsOp
       )}
 
       {/* Action Bar */}
-      <div className="border-t border-gray-700 mx-4 my-1"></div>
+      <div className="border-t border-gray-200 dark:border-gray-700 mx-4 my-1"></div>
       <div className="px-4 py-1 flex justify-around">
         <button 
           onClick={() => onLike(post._id)}
           disabled={!user}
-          className={`flex items-center space-x-2 p-2 rounded-md transition-colors duration-200 w-full justify-center ${isLikedByCurrentUser ? 'text-cyan-400' : 'text-gray-400 hover:bg-gray-700'}`}
+          className={`flex items-center space-x-2 p-2 rounded-md transition-colors duration-200 w-full justify-center ${isLikedByCurrentUser ? 'text-cyan-500 dark:text-cyan-400' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'}`}
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill={isLikedByCurrentUser ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 18.331v-11h2.066a2 2 0 011.789 1.106l.823 2.468zM7 9V5a2 2 0 012-2h2a2 2 0 012 2v4z" /></svg>
           <span>Like</span>
         </button>
         <button 
           onClick={() => onToggleComments(post._id)}
-          className="flex items-center space-x-2 p-2 rounded-md text-gray-400 hover:bg-gray-700 transition-colors duration-200 w-full justify-center"
+          className="flex items-center space-x-2 p-2 rounded-md text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 w-full justify-center"
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
           <span>Comment</span>
@@ -130,7 +129,7 @@ const PostItem = ({ post, onLike, onCommentAdded, onToggleComments, isCommentsOp
         <button 
           onClick={handleRepost}
           disabled={!user}
-          className="flex items-center space-x-2 p-2 rounded-md text-gray-400 hover:bg-gray-700 transition-colors duration-200 w-full justify-center"
+          className="flex items-center space-x-2 p-2 rounded-md text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 w-full justify-center"
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h5M20 20v-5h-5M4 20h5v-5M20 4h-5v5" /></svg>
           <span>Repost</span>
@@ -138,7 +137,7 @@ const PostItem = ({ post, onLike, onCommentAdded, onToggleComments, isCommentsOp
         <button 
           onClick={handleSend}
           disabled={!user}
-          className="flex items-center space-x-2 p-2 rounded-md text-gray-400 hover:bg-gray-700 transition-colors duration-200 w-full justify-center"
+          className="flex items-center space-x-2 p-2 rounded-md text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 w-full justify-center"
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
           <span>Send</span>

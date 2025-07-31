@@ -2,14 +2,20 @@ import React, { useState } from 'react';
 import api from '../services/api';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
-import Modal from './Modal'; // 1. Import the Modal component
+import Modal from './Modal';
 
-// 2. Accept isOpen and onClose props to control the modal
 const CreatePostForm = ({ onPostCreated, isOpen, onClose }) => {
   const { user } = useAuth();
   const [content, setContent] = useState('');
   const [imageFile, setImageFile] = useState(null);
   const [uploading, setUploading] = useState(false);
+
+  // --- FIX: Construct the full image URL ---
+  const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  const getFullImageUrl = (path) => {
+    if (!path) return null;
+    return `${API_BASE_URL.replace('/api', '')}${path}`;
+  };
 
   const handleFileChange = (e) => {
     setImageFile(e.target.files[0]);
@@ -43,7 +49,6 @@ const CreatePostForm = ({ onPostCreated, isOpen, onClose }) => {
       }
       
       toast.success('Post created successfully!');
-      // Reset state and close modal
       setContent('');
       setImageFile(null);
       onClose();
@@ -57,11 +62,10 @@ const CreatePostForm = ({ onPostCreated, isOpen, onClose }) => {
   };
 
   return (
-    // 3. Wrap the entire form in the Modal component
     <Modal isOpen={isOpen} onClose={onClose}>
       <div className="flex items-center mb-4">
         <img 
-          src={user?.profileImageUrl || `https://placehold.co/48x48/1f2937/9ca3af?text=${user?.username.charAt(0)}`} 
+          src={getFullImageUrl(user?.profileImageUrl) || `https://placehold.co/48x48/1f2937/9ca3af?text=${user?.username.charAt(0)}`} 
           alt="Your profile" 
           className="w-12 h-12 rounded-full mr-4"
         />
@@ -83,8 +87,7 @@ const CreatePostForm = ({ onPostCreated, isOpen, onClose }) => {
         
         <div className="flex items-center justify-between mt-4">
           <div>
-            {/* Placeholder for image icon */}
-            <label htmlFor="postImageFileModal" className="cursor-pointer text-gray-400 hover:text-cyan-400 p-2 rounded-full">
+            <label htmlFor="postImageFileModal" className="cursor-pointer text-gray-400 hover:text-cyan-400 p-2 rounded-full text-2xl">
               📷
             </label>
             <input

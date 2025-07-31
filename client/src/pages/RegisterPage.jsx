@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
-import toast from 'react-hot-toast'; // 1. Import toast
+import toast from 'react-hot-toast';
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({
@@ -24,7 +24,6 @@ const RegisterPage = () => {
   const onSubmit = async (e) => {
     e.preventDefault();
     if (password !== password2) {
-      // 2. Show an error toast if passwords don't match
       toast.error('Passwords do not match');
     } else {
       try {
@@ -33,32 +32,26 @@ const RegisterPage = () => {
           email,
           password,
         };
-
         await api.post('/auth/register', userData);
-
-        // 3. Show a success toast
         toast.success('Successfully registered! Please log in.');
-        
         navigate('/login');
-
       } catch (error) {
-        // 4. Show an error toast from the backend
         const message = error.response?.data?.message || 'Registration failed. Please try again.';
         toast.error(message);
-        console.error('Registration failed:', message);
       }
     }
   };
 
   return (
     <div className="h-full flex items-center justify-center">
-      <div className="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-md">
-        <h1 className="text-4xl font-bold text-cyan-400 mb-6 text-center">
+      {/* --- THEME UPDATE --- */}
+      <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-md">
+        <h1 className="text-4xl font-bold text-cyan-500 dark:text-cyan-400 mb-6 text-center">
           Register
         </h1>
         <form onSubmit={onSubmit}>
           <div className="mb-4">
-            <label htmlFor="username" className="block text-gray-300 mb-2">
+            <label htmlFor="username" className="block text-gray-600 dark:text-gray-300 mb-2">
               Username
             </label>
             <input
@@ -68,11 +61,11 @@ const RegisterPage = () => {
               value={username}
               onChange={onChange}
               required
-              className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-cyan-400"
+              className="w-full px-3 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 dark:focus:ring-cyan-400"
             />
           </div>
           <div className="mb-4">
-            <label htmlFor="email" className="block text-gray-300 mb-2">
+            <label htmlFor="email" className="block text-gray-600 dark:text-gray-300 mb-2">
               Email
             </label>
             <input
@@ -82,11 +75,11 @@ const RegisterPage = () => {
               value={email}
               onChange={onChange}
               required
-              className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-cyan-400"
+              className="w-full px-3 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 dark:focus:ring-cyan-400"
             />
           </div>
           <div className="mb-4">
-            <label htmlFor="password" className="block text-gray-300 mb-2">
+            <label htmlFor="password" className="block text-gray-600 dark:text-gray-300 mb-2">
               Password
             </label>
             <input
@@ -97,11 +90,11 @@ const RegisterPage = () => {
               onChange={onChange}
               required
               minLength="6"
-              className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-cyan-400"
+              className="w-full px-3 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 dark:focus:ring-cyan-400"
             />
           </div>
           <div className="mb-6">
-            <label htmlFor="password2" className="block text-gray-300 mb-2">
+            <label htmlFor="password2" className="block text-gray-600 dark:text-gray-300 mb-2">
               Confirm Password
             </label>
             <input
@@ -112,7 +105,7 @@ const RegisterPage = () => {
               onChange={onChange}
               required
               minLength="6"
-              className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-cyan-400"
+              className="w-full px-3 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 dark:focus:ring-cyan-400"
             />
           </div>
           <button
@@ -122,9 +115,9 @@ const RegisterPage = () => {
             Register
           </button>
         </form>
-        <p className="text-center text-gray-400 mt-6">
+        <p className="text-center text-gray-500 dark:text-gray-400 mt-6">
           Already have an account?{' '}
-          <Link to="/login" className="text-cyan-400 hover:underline">
+          <Link to="/login" className="text-cyan-500 dark:text-cyan-400 hover:underline">
             Login here
           </Link>
         </p>
