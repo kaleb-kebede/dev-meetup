@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 import Modal from './Modal';
 import CodeSnippetForm from './CodeSnippetForm';
+import { getProfileImageUrl } from '../utils/imageUtils';
 
 const CreatePostForm = ({ onPostCreated, isOpen, onClose }) => {
   const { user } = useAuth();
@@ -15,12 +16,6 @@ const CreatePostForm = ({ onPostCreated, isOpen, onClose }) => {
     language: 'javascript',
     title: ''
   });
-
-  const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-  const getFullImageUrl = (path) => {
-    if (!path) return null;
-    return `${API_BASE_URL.replace('/api', '')}${path}`;
-  };
 
   const handleFileChange = (e) => {
     setImageFile(e.target.files[0]);
@@ -81,9 +76,12 @@ const CreatePostForm = ({ onPostCreated, isOpen, onClose }) => {
         {/* Header */}
         <div className="flex items-center space-x-4 pb-4 border-b border-gray-200 dark:border-gray-700">
           <img 
-            src={getFullImageUrl(user?.profileImageUrl) || `https://placehold.co/48x48/1f2937/9ca3af?text=${user?.username.charAt(0)}`} 
+            src={getProfileImageUrl(user?.profileImageUrl, user?.username)} 
             alt="Your profile" 
-            className="w-12 h-12 rounded-full ring-2 ring-cyan-500/20"
+            className="w-12 h-12 rounded-full ring-2 ring-cyan-500/20 object-cover"
+            onError={(e) => {
+              e.target.src = `https://placehold.co/48x48/1f2937/9ca3af?text=${user?.username?.charAt(0) || 'U'}`;
+            }}
           />
           <div>
             <h2 className="text-xl font-bold text-gray-900 dark:text-white">{user?.username}</h2>

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
+import { getProfileImageUrl } from '../utils/imageUtils';
 
 // A single, recursive component for comments and their replies
 const CommentItem = ({ comment, postId, onReplyAdded }) => {
@@ -10,7 +11,7 @@ const CommentItem = ({ comment, postId, onReplyAdded }) => {
   const [replyContent, setReplyContent] = useState('');
 
   const authorUsername = comment.user?.username || 'User';
-  const authorProfileImg = comment.user?.profileImageUrl || `https://placehold.co/40x40/E2E8F0/475569?text=${authorUsername.charAt(0)}`;
+  const authorProfileImg = getProfileImageUrl(comment.user?.profileImageUrl, authorUsername);
 
   const handleReplySubmit = async (e) => {
     e.preventDefault();
@@ -47,7 +48,7 @@ const CommentItem = ({ comment, postId, onReplyAdded }) => {
       <img 
         src={authorProfileImg} 
         alt={`${authorUsername}'s profile`}
-        className="w-10 h-10 rounded-full ring-2 ring-cyan-500/20"
+        className="w-10 h-10 rounded-full ring-2 ring-cyan-500/20 object-cover"
       />
       <div className="flex-1">
         {/* Comment Content */}
@@ -81,9 +82,9 @@ const CommentItem = ({ comment, postId, onReplyAdded }) => {
         {showReplyForm && (
           <form onSubmit={handleReplySubmit} className="mt-3 flex items-start space-x-3">
             <img 
-              src={user.profileImageUrl || `https://placehold.co/32x32/E2E8F0/475569?text=${user.username.charAt(0)}`} 
+              src={getProfileImageUrl(user?.profileImageUrl, user?.username)} 
               alt="Your profile" 
-              className="w-8 h-8 rounded-full ring-1 ring-cyan-500/20" 
+              className="w-8 h-8 rounded-full ring-1 ring-cyan-500/20 object-cover" 
             />
             <div className="flex-1">
               <input
@@ -175,9 +176,9 @@ const CommentSection = ({ postId, onCommentAdded }) => {
         {user && (
           <form onSubmit={handleCommentSubmit} className="flex items-start space-x-3 mb-6">
             <img 
-              src={user.profileImageUrl || `https://placehold.co/40x40/E2E8F0/475569?text=${user.username.charAt(0)}`} 
+              src={getProfileImageUrl(user?.profileImageUrl, user?.username)} 
               alt="Your profile" 
-              className="w-10 h-10 rounded-full ring-2 ring-cyan-500/20" 
+              className="w-10 h-10 rounded-full ring-2 ring-cyan-500/20 object-cover" 
             />
             <div className="flex-1">
               <input

@@ -5,6 +5,7 @@ import CreatePostForm from '../components/CreatePostForm';
 import PostItem from '../components/PostItem';
 import Spinner from '../components/Spinner';
 import { useAuth } from '../context/AuthContext';
+import { getProfileImageUrl } from '../utils/imageUtils';
 
 const HomePage = () => {
   const { user } = useAuth();
@@ -13,12 +14,6 @@ const HomePage = () => {
   const [openCommentPostId, setOpenCommentPostId] = useState(null);
   const [feedType, setFeedType] = useState('following');
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-  const getFullImageUrl = (path) => {
-    if (!path) return null;
-    return `${API_BASE_URL.replace('/api', '')}${path}`;
-  };
 
   const fetchPosts = useCallback(async () => {
     const url = feedType === 'following' ? '/posts/feed' : '/posts';
@@ -93,9 +88,9 @@ const HomePage = () => {
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 mb-8">
           <div className="flex items-center space-x-4">
             <img 
-              src={getFullImageUrl(user.profileImageUrl) || `https://placehold.co/48x48/1f2937/9ca3af?text=${user.username.charAt(0)}`} 
+              src={getProfileImageUrl(user.profileImageUrl, user.username)} 
               alt="Your profile" 
-              className="w-12 h-12 rounded-full ring-2 ring-cyan-500/20"
+              className="w-12 h-12 rounded-full ring-2 ring-cyan-500/20 object-cover"
             />
             <button 
               onClick={() => setIsModalOpen(true)}

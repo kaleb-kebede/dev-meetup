@@ -4,6 +4,7 @@ import api from '../services/api';
 import PostItem from '../components/PostItem';
 import { useAuth } from '../context/AuthContext';
 import Spinner from '../components/Spinner';
+import { getProfileImageUrl } from '../utils/imageUtils';
 
 const ProfilePage = () => {
   const { username } = useParams();
@@ -12,12 +13,6 @@ const ProfilePage = () => {
   const [profileData, setProfileData] = useState({ profile: null, posts: [] });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-  const getFullImageUrl = (path) => {
-    if (!path) return null;
-    return `${API_BASE_URL.replace('/api', '')}${path}`;
-  };
 
   const fetchProfileData = useCallback(async () => {
     try {
@@ -94,9 +89,9 @@ const ProfilePage = () => {
           {/* Profile Image */}
           <div className="relative">
             <img 
-              src={getFullImageUrl(profile.profileImageUrl) || `https://placehold.co/120x120/E2E8F0/475569?text=${profile.username.charAt(0)}`}
+              src={getProfileImageUrl(profile.profileImageUrl, profile.username)}
               alt={`${profile.username}'s profile`}
-              className="w-32 h-32 rounded-full ring-4 ring-cyan-500/20 shadow-lg"
+              className="w-32 h-32 rounded-full ring-4 ring-cyan-500/20 shadow-lg object-cover"
             />
             {isOwnProfile && (
               <Link 

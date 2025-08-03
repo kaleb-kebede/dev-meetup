@@ -45,6 +45,7 @@ export const registerUser = async (req, res) => {
         _id: user._id,
         username: user.username,
         email: user.email,
+        profileImageUrl: user.profileImageUrl,
         token: generateToken(user._id),
       });
     } else {
@@ -54,6 +55,7 @@ export const registerUser = async (req, res) => {
     res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
+
 // @desc    Authenticate user & get token (Login)
 // @route   POST /api/auth/login
 // @access  Public
@@ -72,6 +74,7 @@ export const loginUser = async (req, res) => {
         _id: user._id,
         username: user.username,
         email: user.email,
+        profileImageUrl: user.profileImageUrl,
         token: generateToken(user._id),
       });
     } else {

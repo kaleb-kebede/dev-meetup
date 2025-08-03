@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import CommentSection from './CommentSection';
 import CodeSnippet from './CodeSnippet';
 import toast from 'react-hot-toast';
+import { getProfileImageUrl, getPostImageUrl } from '../utils/imageUtils';
 
 const PostItem = ({ post, onLike, onCommentAdded, onToggleComments, isCommentsOpen, onDelete, onUpdate }) => {
   const { user } = useAuth();
@@ -15,12 +16,6 @@ const PostItem = ({ post, onLike, onCommentAdded, onToggleComments, isCommentsOp
   const [editedImageUrl, setEditedImageUrl] = useState(post.imageUrl || '');
   const [editedCodeSnippet, setEditedCodeSnippet] = useState(post.codeSnippet || { code: '', language: 'javascript', title: '' });
   const [showOptions, setShowOptions] = useState(false);
-
-  const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-  const getFullImageUrl = (path) => {
-    if (!path) return null;
-    return `${API_BASE_URL.replace('/api', '')}${path}`;
-  };
 
   const formatDate = (dateString) => {
     const seconds = Math.floor((new Date() - new Date(dateString)) / 1000);
@@ -59,9 +54,9 @@ const PostItem = ({ post, onLike, onCommentAdded, onToggleComments, isCommentsOp
           <div className="flex items-center space-x-4">
             <Link to={`/profile/${post.user.username}`}>
               <img 
-                src={getFullImageUrl(post.user.profileImageUrl) || `https://placehold.co/48x48/E2E8F0/475569?text=${post.user.username.charAt(0)}`}
+                src={getProfileImageUrl(post.user.profileImageUrl, post.user.username)}
                 alt={`${post.user.username}'s profile`}
-                className="w-12 h-12 rounded-full ring-2 ring-cyan-500/20"
+                className="w-12 h-12 rounded-full ring-2 ring-cyan-500/20 object-cover"
               />
             </Link>
             <div>
@@ -193,7 +188,7 @@ const PostItem = ({ post, onLike, onCommentAdded, onToggleComments, isCommentsOp
             {post.imageUrl && (
               <div className="mb-6">
                 <img 
-                  src={getFullImageUrl(post.imageUrl)} 
+                  src={getPostImageUrl(post.imageUrl)} 
                   alt="Post content" 
                   className="rounded-xl w-full object-cover shadow-md"
                 />
