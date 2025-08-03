@@ -1,33 +1,45 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
-// This component takes three props:
-// isOpen: a boolean to control visibility
-// onClose: a function to call when the modal should be closed
-// children: the content to display inside the modal
 const Modal = ({ isOpen, onClose, children }) => {
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
   if (!isOpen) {
-    return null; // Don't render anything if the modal is closed
+    return null;
   }
 
   return (
-    // The semi-transparent backdrop
     <div 
-      className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50"
-      onClick={onClose} // Close the modal if the backdrop is clicked
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center z-50 p-4"
+      onClick={onClose}
     >
-      {/* The modal content itself */}
       <div 
-        className="bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl p-6 relative"
-        onClick={(e) => e.stopPropagation()} // Prevent clicks inside the modal from closing it
+        className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto relative transform transition-all duration-300 ease-out"
+        onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
         <button 
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl"
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 z-10"
         >
-          &times;
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
         </button>
-        {children}
+        
+        {/* Modal Content */}
+        <div className="p-6">
+          {children}
+        </div>
       </div>
     </div>
   );

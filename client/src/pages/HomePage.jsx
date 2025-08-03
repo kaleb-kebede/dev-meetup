@@ -87,21 +87,23 @@ const HomePage = () => {
   };
 
   return (
-    <div className="container mx-auto p-4 md:p-8">
+    <div className="max-w-4xl mx-auto">
+      {/* Create Post Section */}
       {user && (
-        // --- THEME UPDATE ---
-        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg mb-8 flex items-center space-x-4">
-          <img 
-            src={getFullImageUrl(user.profileImageUrl) || `https://placehold.co/48x48/1f2937/9ca3af?text=${user.username.charAt(0)}`} 
-            alt="Your profile" 
-            className="w-12 h-12 rounded-full"
-          />
-          <button 
-            onClick={() => setIsModalOpen(true)}
-            className="flex-grow bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-left text-gray-500 dark:text-gray-400 px-4 py-3 rounded-full transition-colors duration-200"
-          >
-            Start a post...
-          </button>
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 mb-8">
+          <div className="flex items-center space-x-4">
+            <img 
+              src={getFullImageUrl(user.profileImageUrl) || `https://placehold.co/48x48/1f2937/9ca3af?text=${user.username.charAt(0)}`} 
+              alt="Your profile" 
+              className="w-12 h-12 rounded-full ring-2 ring-cyan-500/20"
+            />
+            <button 
+              onClick={() => setIsModalOpen(true)}
+              className="flex-grow bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 text-left text-gray-500 dark:text-gray-400 px-6 py-4 rounded-xl transition-all duration-200 border border-gray-200 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-cyan-500/50"
+            >
+              <span className="text-lg">Share your thoughts, code, or discoveries...</span>
+            </button>
+          </div>
         </div>
       )}
 
@@ -111,29 +113,55 @@ const HomePage = () => {
         onPostCreated={handlePostCreated} 
       />
       
-      {/* --- THEME UPDATE --- */}
-      <div className="mt-8 mb-4 flex border-b-2 border-gray-200 dark:border-gray-700">
-        <button 
-          onClick={() => setFeedType('following')}
-          className={`py-2 px-4 font-semibold transition-colors duration-200 ${feedType === 'following' ? 'text-cyan-500 dark:text-cyan-400 border-b-2 border-cyan-500 dark:border-cyan-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}`}
-        >
-          Following
-        </button>
-        <button 
-          onClick={() => setFeedType('global')}
-          className={`py-2 px-4 font-semibold transition-colors duration-200 ${feedType === 'global' ? 'text-cyan-500 dark:text-cyan-400 border-b-2 border-cyan-500 dark:border-cyan-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}`}
-        >
-          Discover
-        </button>
+      {/* Feed Type Selector */}
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-1 mb-8">
+        <div className="flex">
+          <button 
+            onClick={() => setFeedType('following')}
+            className={`flex-1 py-3 px-6 font-semibold text-sm rounded-xl transition-all duration-200 ${
+              feedType === 'following' 
+                ? 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-md' 
+                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700'
+            }`}
+          >
+            Following
+          </button>
+          <button 
+            onClick={() => setFeedType('global')}
+            className={`flex-1 py-3 px-6 font-semibold text-sm rounded-xl transition-all duration-200 ${
+              feedType === 'global' 
+                ? 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-md' 
+                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700'
+            }`}
+          >
+            Discover
+          </button>
+        </div>
       </div>
 
+      {/* Posts Feed */}
       <div className="space-y-6">
         {loading ? (
-          <Spinner />
+          <div className="flex justify-center items-center py-12">
+            <Spinner />
+          </div>
         ) : posts.length === 0 ? (
-          <p className="text-gray-500 dark:text-gray-400">
-            {feedType === 'following' ? "You're not following anyone yet, or they haven't posted." : "No posts yet. Be the first to share!"}
-          </p>
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-12 text-center">
+            <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+              {feedType === 'following' ? "No posts from people you follow" : "No posts yet"}
+            </h3>
+            <p className="text-gray-500 dark:text-gray-400">
+              {feedType === 'following' 
+                ? "Start following other developers or encourage them to share their thoughts!" 
+                : "Be the first to share your thoughts, code, or discoveries with the community!"
+              }
+            </p>
+          </div>
         ) : (
           posts.map((post) => (
             <PostItem 
