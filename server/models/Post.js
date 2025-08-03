@@ -16,6 +16,21 @@ const PostSchema = new mongoose.Schema({
     type: String,
     default: '',
   },
+  // --- NEW FIELDS FOR CODE SNIPPETS ---
+  codeSnippet: {
+    code: {
+      type: String,
+      default: '',
+    },
+    language: {
+      type: String,
+      default: 'javascript',
+    },
+    title: {
+      type: String,
+      default: '',
+    },
+  },
   likes: {
     type: [mongoose.Schema.Types.ObjectId],
     ref: 'User',

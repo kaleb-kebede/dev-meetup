@@ -3,12 +3,18 @@ import api from '../services/api';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 import Modal from './Modal';
+import CodeSnippetForm from './CodeSnippetForm';
 
 const CreatePostForm = ({ onPostCreated, isOpen, onClose }) => {
   const { user } = useAuth();
   const [content, setContent] = useState('');
   const [imageFile, setImageFile] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const [codeSnippet, setCodeSnippet] = useState({
+    code: '',
+    language: 'javascript',
+    title: ''
+  });
 
   // --- FIX: Construct the full image URL ---
   const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
@@ -21,10 +27,14 @@ const CreatePostForm = ({ onPostCreated, isOpen, onClose }) => {
     setImageFile(e.target.files[0]);
   };
 
+  const handleCodeSnippetChange = (newCodeSnippet) => {
+    setCodeSnippet(newCodeSnippet);
+  };
+
   const onSubmit = async (e) => {
     e.preventDefault();
-    if (!content.trim()) {
-      toast.error('Post content cannot be empty.');
+    if (!content.trim() && !codeSnippet.code.trim() && !imageFile) {
+      toast.error('Post must have content, code snippet, or image.');
       return;
     }
 
@@ -41,7 +51,11 @@ const CreatePostForm = ({ onPostCreated, isOpen, onClose }) => {
         imageUrl = uploadResponse.data.image;
       }
 
-      const postData = { content, imageUrl };
+      const postData = { 
+        content, 
+        imageUrl,
+        codeSnippet: codeSnippet.code.trim() ? codeSnippet : null
+      };
       const response = await api.post('/posts', postData);
 
       if (onPostCreated) {
@@ -51,6 +65,7 @@ const CreatePostForm = ({ onPostCreated, isOpen, onClose }) => {
       toast.success('Post created successfully!');
       setContent('');
       setImageFile(null);
+      setCodeSnippet({ code: '', language: 'javascript', title: '' });
       onClose();
 
     } catch (error) {
@@ -78,15 +93,20 @@ const CreatePostForm = ({ onPostCreated, isOpen, onClose }) => {
       <form onSubmit={onSubmit}>
         <textarea
           className="w-full p-2 bg-transparent text-white text-lg placeholder-gray-400 focus:outline-none"
-          rows="6"
+          rows="4"
           placeholder="What do you want to talk about?"
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          required
         ></textarea>
         
+        {/* Code Snippet Form */}
+        <CodeSnippetForm 
+          codeSnippet={codeSnippet}
+          onCodeSnippetChange={handleCodeSnippetChange}
+        />
+        
         <div className="flex items-center justify-between mt-4">
-          <div>
+          <div className="flex items-center space-x-2">
             <label htmlFor="postImageFileModal" className="cursor-pointer text-gray-400 hover:text-cyan-400 p-2 rounded-full text-2xl">
               📷
             </label>
@@ -96,12 +116,12 @@ const CreatePostForm = ({ onPostCreated, isOpen, onClose }) => {
               className="hidden"
               onChange={handleFileChange}
             />
-            {imageFile && <span className="text-sm text-gray-400 ml-2">{imageFile.name}</span>}
+            {imageFile && <span className="text-sm text-gray-400">{imageFile.name}</span>}
           </div>
           <button
             type="submit"
             className="bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-2 px-6 rounded-full transition duration-300 disabled:bg-gray-600"
-            disabled={uploading || !content.trim()}
+            disabled={uploading || (!content.trim() && !codeSnippet.code.trim() && !imageFile)}
           >
             {uploading ? 'Posting...' : 'Post'}
           </button>

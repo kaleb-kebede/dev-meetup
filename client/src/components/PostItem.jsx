@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import CommentSection from './CommentSection';
+import CodeSnippet from './CodeSnippet';
 import toast from 'react-hot-toast';
 
 const PostItem = ({ post, onLike, onCommentAdded, onToggleComments, isCommentsOpen, onDelete, onUpdate }) => {
@@ -12,6 +13,7 @@ const PostItem = ({ post, onLike, onCommentAdded, onToggleComments, isCommentsOp
   const [isEditing, setIsEditing] = useState(false);
   const [editedContent, setEditedContent] = useState(post.content);
   const [editedImageUrl, setEditedImageUrl] = useState(post.imageUrl || '');
+  const [editedCodeSnippet, setEditedCodeSnippet] = useState(post.codeSnippet || { code: '', language: 'javascript', title: '' });
   const [showOptions, setShowOptions] = useState(false);
 
   const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
@@ -37,7 +39,12 @@ const PostItem = ({ post, onLike, onCommentAdded, onToggleComments, isCommentsOp
 
   const handleUpdateSubmit = (e) => {
     e.preventDefault();
-    onUpdate(post._id, { content: editedContent, imageUrl: editedImageUrl });
+    const updateData = {
+      content: editedContent,
+      imageUrl: editedImageUrl,
+      codeSnippet: editedCodeSnippet.code.trim() ? editedCodeSnippet : null
+    };
+    onUpdate(post._id, updateData);
     setIsEditing(false);
   };
 
@@ -82,9 +89,57 @@ const PostItem = ({ post, onLike, onCommentAdded, onToggleComments, isCommentsOp
       {/* Post Body */}
       <div className="px-4 pb-2">
         {isEditing ? (
-          <form onSubmit={handleUpdateSubmit}>
-            <textarea value={editedContent} onChange={(e) => setEditedContent(e.target.value)} className="w-full p-2 mb-2 bg-gray-100 dark:bg-gray-700 rounded-lg text-gray-900 dark:text-white" rows="3"/>
-            <input type="url" value={editedImageUrl} onChange={(e) => setEditedImageUrl(e.target.value)} className="w-full p-2 bg-gray-100 dark:bg-gray-700 rounded-lg text-gray-900 dark:text-white" placeholder="Image URL"/>
+          <form onSubmit={handleUpdateSubmit} className="space-y-4">
+            <textarea 
+              value={editedContent} 
+              onChange={(e) => setEditedContent(e.target.value)} 
+              className="w-full p-2 mb-2 bg-gray-100 dark:bg-gray-700 rounded-lg text-gray-900 dark:text-white" 
+              rows="3"
+              placeholder="Post content..."
+            />
+            <input 
+              type="url" 
+              value={editedImageUrl} 
+              onChange={(e) => setEditedImageUrl(e.target.value)} 
+              className="w-full p-2 bg-gray-100 dark:bg-gray-700 rounded-lg text-gray-900 dark:text-white" 
+              placeholder="Image URL"
+            />
+            
+            {/* Code Snippet Edit Form */}
+            <div className="border border-gray-300 dark:border-gray-600 rounded-lg p-3">
+              <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Code Snippet</h4>
+              <input
+                type="text"
+                value={editedCodeSnippet.title || ''}
+                onChange={(e) => setEditedCodeSnippet({...editedCodeSnippet, title: e.target.value})}
+                className="w-full p-2 mb-2 bg-gray-100 dark:bg-gray-700 rounded-lg text-gray-900 dark:text-white"
+                placeholder="Snippet title (optional)"
+              />
+              <select
+                value={editedCodeSnippet.language || 'javascript'}
+                onChange={(e) => setEditedCodeSnippet({...editedCodeSnippet, language: e.target.value})}
+                className="w-full p-2 mb-2 bg-gray-100 dark:bg-gray-700 rounded-lg text-gray-900 dark:text-white"
+              >
+                <option value="javascript">JavaScript</option>
+                <option value="python">Python</option>
+                <option value="java">Java</option>
+                <option value="cpp">C++</option>
+                <option value="csharp">C#</option>
+                <option value="php">PHP</option>
+                <option value="html">HTML</option>
+                <option value="css">CSS</option>
+                <option value="sql">SQL</option>
+                <option value="bash">Bash</option>
+              </select>
+              <textarea
+                value={editedCodeSnippet.code || ''}
+                onChange={(e) => setEditedCodeSnippet({...editedCodeSnippet, code: e.target.value})}
+                className="w-full p-2 bg-gray-100 dark:bg-gray-700 rounded-lg text-gray-900 dark:text-white font-mono text-sm"
+                rows="6"
+                placeholder="Paste your code here..."
+              />
+            </div>
+            
             <div className="flex justify-end mt-2 space-x-2">
               <button type="button" onClick={() => setIsEditing(false)} className="bg-gray-500 hover:bg-gray-400 text-white font-bold py-1 px-3 rounded-lg">Cancel</button>
               <button type="submit" className="bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-1 px-3 rounded-lg">Save</button>
@@ -92,7 +147,19 @@ const PostItem = ({ post, onLike, onCommentAdded, onToggleComments, isCommentsOp
           </form>
         ) : (
           <>
-            <p className="text-gray-800 dark:text-gray-200 whitespace-pre-wrap">{post.content}</p>
+            {post.content && (
+              <p className="text-gray-800 dark:text-gray-200 whitespace-pre-wrap mb-4">{post.content}</p>
+            )}
+            
+            {/* Code Snippet Display */}
+            {post.codeSnippet && post.codeSnippet.code && (
+              <CodeSnippet 
+                code={post.codeSnippet.code}
+                language={post.codeSnippet.language}
+                title={post.codeSnippet.title}
+              />
+            )}
+            
             {post.imageUrl && <img src={getFullImageUrl(post.imageUrl)} alt="Post content" className="mt-4 rounded-lg w-full object-cover"/>}
           </>
         )}

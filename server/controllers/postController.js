@@ -6,11 +6,11 @@ import Comment from "../models/Comment.js";
 
 export const createPost = async (req, res) => {
   try {
-    const { content, imageUrl } = req.body;
-    if (!content) {
-      return res.status(400).json({ message: "Post content cannot be empty" });
+    const { content, imageUrl, codeSnippet } = req.body;
+    if (!content && !imageUrl && !codeSnippet?.code) {
+      return res.status(400).json({ message: "Post must have content, image, or code snippet" });
     }
-    const newPost = new Post({ content, imageUrl, user: req.user.id });
+    const newPost = new Post({ content, imageUrl, codeSnippet, user: req.user.id });
     const savedPost = await newPost.save();
     const populatedPost = await Post.findById(savedPost._id).populate(
       "user",
@@ -168,6 +168,7 @@ export const updatePost = async (req, res) => {
     }
     post.content = req.body.content || post.content;
     post.imageUrl = req.body.imageUrl || post.imageUrl;
+    post.codeSnippet = req.body.codeSnippet || post.codeSnippet;
     const updatedPost = await post.save();
     const populatedPost = await Post.findById(updatedPost._id).populate(
       "user",
