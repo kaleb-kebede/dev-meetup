@@ -7,6 +7,9 @@ import RegisterPage from './pages/RegisterPage';
 import ProfilePage from './pages/ProfilePage';
 import EditProfilePage from './pages/EditProfilePage';
 import SearchPage from './pages/SearchPage';
+import ThemeTest from './components/ThemeTest';
+import DarkModeSummary from './components/DarkModeSummary';
+import ThemeVerifier from './components/ThemeVerifier';
 import { useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import ThemeToggleButton from './components/ThemeToggleButton';
@@ -73,6 +76,12 @@ function App() {
                       Profile
                     </Link>
                   )}
+                  <Link 
+                    to="/theme-test" 
+                    className="text-gray-600 dark:text-gray-300 hover:text-cyan-500 dark:hover:text-cyan-400 transition-colors duration-200 font-medium"
+                  >
+                    Theme Test
+                  </Link>
                   <button 
                     onClick={handleLogout} 
                     className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
@@ -110,11 +119,15 @@ function App() {
             <Route path="/profile/:username" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
             <Route path="/profile/edit" element={<ProtectedRoute><EditProfilePage /></ProtectedRoute>} />
             <Route path="/search" element={<ProtectedRoute><SearchPage /></ProtectedRoute>} />
+            <Route path="/theme-test" element={<DarkModeSummary />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
           </Routes>
         </div>
       </main>
+
+      {/* Theme Verifier - Temporary for testing */}
+      <ThemeVerifier />
     </div>
   );
 }
