@@ -1,17 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
-import DirectMessage from '../components/DirectMessage';
-import { Link } from 'react-router-dom';
+import { useSearchParams, Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
+import DirectMessage from '../components/DirectMessage';
+import { useAuth } from '../context/AuthContext';
+import { getProfileImageUrl } from '../utils/imageUtils';
 
 const SearchPage = () => {
-  const [query, setQuery] = useState('');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const query = searchParams.get('q') || '';
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showMessageModal, setShowMessageModal] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [selectedUserName, setSelectedUserName] = useState(null);
   const { user: currentUser } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!query.trim()) {
@@ -39,6 +42,15 @@ const SearchPage = () => {
     return () => clearTimeout(delayDebounceFn);
   }, [query]);
 
+  const handleSearchChange = (e) => {
+    const newQuery = e.target.value;
+    if (newQuery.trim()) {
+      setSearchParams({ q: newQuery });
+    } else {
+      setSearchParams({});
+    }
+  };
+
   return (
     <div className="container mx-auto p-4 md:p-8">
       {/* --- THEME UPDATE --- */}
@@ -48,7 +60,7 @@ const SearchPage = () => {
         <input
           type="text"
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={handleSearchChange}
           placeholder="Search by username..."
           className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 dark:focus:ring-cyan-400"
         />
@@ -64,9 +76,12 @@ const SearchPage = () => {
             <div key={user._id} className="bg-white dark:bg-gray-800 p-4 rounded-lg flex items-center justify-between hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 shadow">
               <div className="flex items-center">
                 <img 
-                  src={user.profileImageUrl || `https://placehold.co/40x40/E2E8F0/475569?text=${user.username.charAt(0)}`}
+                  src={getProfileImageUrl(user.profileImageUrl, user.username)}
                   alt={user.username}
-                  className="w-10 h-10 rounded-full mr-4"
+                  className="w-10 h-10 rounded-full mr-4 object-cover"
+                  onError={(e) => {
+                    e.target.src = `https://placehold.co/40x40/E2E8F0/475569?text=${user.username.charAt(0)}`;
+                  }}
                 />
                 <Link to={`/profile/${user.username}`} className="font-bold text-lg text-gray-800 dark:text-gray-200">
                   {user.username}

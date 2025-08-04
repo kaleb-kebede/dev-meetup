@@ -3,6 +3,237 @@
 ## Overview
 I've completely redesigned the Dev Meetup application's UI to give it a modern, professional look with improved alignment, spacing, and visual hierarchy.
 
+## 🚀 **Latest LinkedIn-Style Redesign (Latest Update)**
+
+### **1. Three-Column Layout Implementation**
+```jsx
+// New HomePage Structure:
+- Header: Sticky top navigation with search
+- Left Sidebar: Profile card and navigation links
+- Main Feed: Posts and content
+- Right Sidebar: Suggestions and info cards
+- Mobile Navigation: Bottom navigation for mobile
+```
+
+**Key Features:**
+- **Responsive Grid**: `grid-cols-1 lg:grid-cols-[225px_1fr_300px] md:grid-cols-[225px_1fr]`
+- **Sticky Sidebars**: Sidebars stay in view while scrolling
+- **Mobile-First**: Proper responsive breakpoints
+- **Professional Layout**: LinkedIn-inspired design
+
+### **2. Profile Image Visibility Fixes**
+```jsx
+// Updated Components with Proper Image Handling:
+- ProfileCard.jsx: Left sidebar profile image
+- CreatePost.jsx: Post creation avatar
+- Header.jsx: Navigation profile image
+- SearchPage.jsx: Search result avatars
+- PostItem.jsx: Post author avatars
+- CommentSection.jsx: Comment user avatars
+```
+
+**Key Improvements:**
+- **Consistent Image Utility**: All components use `getProfileImageUrl()` function
+- **Object-Cover Class**: Added `object-cover` for proper image display
+- **Error Handling**: `onError` fallbacks for broken images
+- **Fallback Images**: Placeholder images with user initials
+- **Proper Sizing**: Consistent image dimensions across components
+
+### **3. Enhanced Navigation System**
+```jsx
+// New Header Component:
+- Functional search with navigation
+- Mobile-responsive design
+- Proper authentication integration
+- Professional styling with gradients
+```
+
+**Key Features:**
+- **Search Functionality**: Working search with URL parameters
+- **Mobile Menu**: Collapsible navigation for mobile
+- **User Integration**: Proper user authentication display
+- **Responsive Design**: Adapts to all screen sizes
+
+### **4. Mobile Bottom Navigation**
+```jsx
+// New MobileNav Component:
+- Fixed bottom navigation for mobile
+- Active state indicators
+- Smooth transitions
+- Proper spacing and padding
+```
+
+**Key Features:**
+- **Touch-Friendly**: Large touch targets for mobile
+- **Active States**: Clear indication of current page
+- **Smooth Animations**: Professional transitions
+- **Proper Z-Index**: Stays above content
+
+### **5. Real-Time Updates & Optimistic UI**
+```jsx
+// Enhanced MainFeed Component:
+- 30-second polling for real-time updates
+- Optimistic updates for likes and deletes
+- Skeleton loading for better UX
+- Error handling with retry functionality
+```
+
+**Key Features:**
+- **Auto-Refresh**: Posts update automatically
+- **Optimistic Updates**: Immediate UI feedback
+- **Error Recovery**: Retry buttons for failed requests
+- **Loading States**: Professional skeleton loading
+
+### **6. Skeleton Loading System**
+```jsx
+// New PostSkeleton Component:
+- Animated placeholder content
+- Matches actual post structure
+- Smooth loading experience
+- Professional appearance
+```
+
+**Key Features:**
+- **Animated Placeholders**: `animate-pulse` for loading effect
+- **Structure Matching**: Mirrors actual post layout
+- **Professional Appearance**: Clean and modern design
+- **Better UX**: Reduces perceived loading time
+
+### **7. Post Background Consistency & Content Collapsing**
+```jsx
+// Updated PostItem Component:
+- White background matching sidebars
+- Content collapsing for long posts
+- Show more/Show less functionality
+- Consistent styling across all posts
+```
+
+**Key Features:**
+- **Unified Background**: All posts use `bg-white` like sidebars
+- **Content Collapsing**: Posts longer than 300 characters are collapsed
+- **Show More/Less**: Interactive buttons for content expansion
+- **Consistent Styling**: Removed dark mode classes for cleaner look
+- **Better Readability**: Improved text contrast and spacing
+
+**Technical Implementation:**
+```javascript
+// Content collapsing logic
+const shouldCollapse = (content) => {
+  return content && content.length > 300; // Collapse if more than 300 characters
+};
+
+const getTruncatedContent = (content) => {
+  if (!content) return '';
+  return content.length > 300 ? content.substring(0, 300) + '...' : content;
+};
+
+// State management for expansion
+const [isContentExpanded, setIsContentExpanded] = useState(false);
+```
+
+### **8. Code Snippet Collapsing Feature**
+```jsx
+// Updated CodeSnippet Component:
+- Code collapsing for long code blocks
+- Show more/Show less functionality for code
+- Line-based truncation (15+ lines)
+- Professional code display with syntax highlighting
+```
+
+**Key Features:**
+- **Smart Code Truncation**: Code blocks with 15+ lines are collapsed
+- **Line-Based Logic**: Truncates by line count, not character count
+- **Syntax Highlighting**: Maintains proper code formatting
+- **Interactive Controls**: Show more/less buttons with icons
+- **Copy Functionality**: One-click copy with visual feedback
+- **Language Badges**: Clear language indicators
+
+**Technical Implementation:**
+```javascript
+// Code collapsing logic
+const shouldCollapseCode = (code) => {
+  const lines = code.split('\n');
+  return lines.length > 15; // Collapse if more than 15 lines
+};
+
+const getTruncatedCode = (code) => {
+  const lines = code.split('\n');
+  if (lines.length <= 15) return code;
+  return lines.slice(0, 15).join('\n') + '\n// ... (truncated)';
+};
+
+// State management for code expansion
+const [isCodeExpanded, setIsCodeExpanded] = useState(false);
+```
+
+### **9. Dynamic User Suggestions Feature**
+```jsx
+// Updated SuggestionsCard Component:
+- Real-time user suggestions from database
+- Random user selection algorithm
+- Loading states and error handling
+- Follow functionality integration
+- Refresh suggestions capability
+```
+
+**Key Features:**
+- **Database Integration**: Fetches real users from MongoDB
+- **Random Selection**: Algorithm to select random users for suggestions
+- **Current User Filtering**: Excludes the current user from suggestions
+- **Loading States**: Skeleton loading for better UX
+- **Error Handling**: Graceful error states with retry functionality
+- **Follow Integration**: Prepared for follow/unfollow functionality
+- **Refresh Capability**: Users can refresh suggestions
+
+**Backend Implementation:**
+```javascript
+// New getAllUsers controller
+export const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find({}, 'username bio profileImageUrl createdAt')
+      .sort({ createdAt: -1 })
+      .limit(50); // Limit to prevent performance issues
+
+    res.status(200).json(users);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+};
+
+// New route in users.js
+router.get('/', protect, getAllUsers);
+```
+
+**Frontend Implementation:**
+```javascript
+// SuggestionsCard component logic
+const fetchSuggestions = async () => {
+  try {
+    const response = await api.get('/users');
+    const allUsers = response.data;
+    
+    // Filter out current user and get random users
+    const otherUsers = allUsers.filter(user => user._id !== currentUser?._id);
+    const shuffled = otherUsers.sort(() => 0.5 - Math.random());
+    const selectedUsers = shuffled.slice(0, Math.min(4, otherUsers.length));
+    
+    // Transform users into suggestion format
+    const userSuggestions = selectedUsers.map(user => ({
+      id: user._id,
+      name: user.username,
+      desc: user.bio || 'Software Developer',
+      avatar: getProfileImageUrl(user.profileImageUrl, user.username),
+      isFollowing: false
+    }));
+    
+    setSuggestions(userSuggestions);
+  } catch (err) {
+    setError('Failed to load suggestions');
+  }
+};
+```
+
 ## 🎨 **Design System Improvements**
 
 ### **1. Color Palette & Gradients**
@@ -223,5 +454,97 @@ I've completely redesigned the Dev Meetup application's UI to give it a modern, 
 4. **Accessibility**: Inclusive design for all users
 5. **Performance**: Fast and responsive interface
 6. **Scalability**: Design system that grows with the app
+
+## 📋 **Technical Implementation Details**
+
+### **1. Image Handling System**
+```javascript
+// getProfileImageUrl utility function
+export const getProfileImageUrl = (profileImageUrl, username) => {
+  const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  
+  if (!profileImageUrl) {
+    return `https://placehold.co/48x48/1f2937/9ca3af?text=${username?.charAt(0) || 'U'}`;
+  }
+  
+  if (profileImageUrl.startsWith('http://') || profileImageUrl.startsWith('https://')) {
+    return profileImageUrl;
+  }
+  
+  const baseUrl = API_BASE_URL.replace('/api', '');
+  return `${baseUrl}${profileImageUrl}`;
+};
+```
+
+### **2. Responsive Grid System**
+```jsx
+// HomePage Layout
+<div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-[225px_1fr_300px] md:grid-cols-[225px_1fr] gap-x-6 gap-y-6 pt-6 px-4 pb-20 md:pb-6">
+  {/* Left Sidebar */}
+  <div className="hidden md:block lg:block">
+    <div className="sticky top-20">
+      <LeftSidebar />
+    </div>
+  </div>
+  
+  {/* Main Feed */}
+  <div className="min-w-0">
+    <MainFeed />
+  </div>
+  
+  {/* Right Sidebar */}
+  <div className="hidden lg:block">
+    <div className="sticky top-20">
+      <RightSidebar />
+    </div>
+  </div>
+</div>
+```
+
+### **3. Real-Time Updates**
+```javascript
+// MainFeed polling implementation
+useEffect(() => {
+  fetchPosts();
+  
+  const interval = setInterval(() => {
+    if (user) {
+      fetchPosts();
+    }
+  }, 30000);
+
+  return () => clearInterval(interval);
+}, [fetchPosts, user]);
+```
+
+### **4. Content Collapsing System**
+```javascript
+// PostItem content collapsing
+const shouldCollapse = (content) => {
+  return content && content.length > 300;
+};
+
+const getTruncatedContent = (content) => {
+  if (!content) return '';
+  return content.length > 300 ? content.substring(0, 300) + '...' : content;
+};
+
+// Usage in JSX
+{post.content && (
+  <div className="mb-6">
+    <p className="text-gray-800 whitespace-pre-wrap text-lg leading-relaxed">
+      {isContentExpanded ? post.content : getTruncatedContent(post.content)}
+    </p>
+    {shouldCollapse(post.content) && (
+      <button
+        onClick={() => setIsContentExpanded(!isContentExpanded)}
+        className="mt-2 text-cyan-600 hover:text-cyan-700 font-medium text-sm transition-colors duration-200"
+      >
+        {isContentExpanded ? 'Show less' : 'Show more'}
+      </button>
+    )}
+  </div>
+)}
+```
 
 The UI improvements transform Dev Meetup into a professional, modern platform that provides an excellent user experience while maintaining the functionality and features that make it valuable for the developer community. 

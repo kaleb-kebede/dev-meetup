@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 
 const CodeSnippet = ({ code, language, title }) => {
   const [copied, setCopied] = useState(false);
+  const [isCodeExpanded, setIsCodeExpanded] = useState(false);
 
   if (!code || !code.trim()) return null;
 
@@ -28,11 +29,27 @@ const CodeSnippet = ({ code, language, title }) => {
     }
   };
 
+  // Function to determine if code should be collapsed
+  const shouldCollapseCode = (code) => {
+    const lines = code.split('\n');
+    return lines.length > 15; // Collapse if more than 15 lines
+  };
+
+  // Function to get truncated code
+  const getTruncatedCode = (code) => {
+    const lines = code.split('\n');
+    if (lines.length <= 15) return code;
+    return lines.slice(0, 15).join('\n') + '\n// ... (truncated)';
+  };
+
+  const displayCode = isCodeExpanded ? code : getTruncatedCode(code);
+  const needsCollapsing = shouldCollapseCode(code);
+
   return (
-    <div className="my-4 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+    <div className="my-4 rounded-lg overflow-hidden border border-gray-200">
       {title && (
-        <div className="bg-gray-50 dark:bg-gray-800 px-4 py-2 border-b border-gray-200 dark:border-gray-700">
-          <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+        <div className="bg-gray-50 px-4 py-2 border-b border-gray-200">
+          <h4 className="text-sm font-medium text-gray-700">
             {title}
           </h4>
         </div>
@@ -46,11 +63,13 @@ const CodeSnippet = ({ code, language, title }) => {
             borderRadius: 0,
             fontSize: '14px',
             lineHeight: '1.5',
+            maxHeight: isCodeExpanded ? 'none' : '400px',
+            overflow: 'hidden',
           }}
           showLineNumbers={true}
           wrapLines={true}
         >
-          {code}
+          {displayCode}
         </SyntaxHighlighter>
         
         {/* Language Badge */}
@@ -82,6 +101,32 @@ const CodeSnippet = ({ code, language, title }) => {
             </>
           )}
         </button>
+
+        {/* Show More/Less Button for Code */}
+        {needsCollapsing && (
+          <div className="absolute bottom-2 right-2">
+            <button
+              onClick={() => setIsCodeExpanded(!isCodeExpanded)}
+              className="bg-gray-800 hover:bg-gray-700 text-white text-xs px-3 py-1 rounded transition-colors duration-200 flex items-center space-x-1"
+            >
+              {isCodeExpanded ? (
+                <>
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 15l7-7 7 7" />
+                  </svg>
+                  <span>Show less</span>
+                </>
+              ) : (
+                <>
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                  <span>Show more</span>
+                </>
+              )}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

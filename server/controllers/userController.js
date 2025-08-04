@@ -1,6 +1,20 @@
 import User from '../models/User.js';
 import Post from '../models/Post.js';
 
+// Get all users for suggestions
+export const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find({}, 'username bio profileImageUrl createdAt')
+      .sort({ createdAt: -1 })
+      .limit(50); // Limit to prevent performance issues
+
+    res.status(200).json(users);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+};
+
 // ... (getUserProfile, followUser, updateUserProfile, searchUsers functions remain the same) ...
 export const getUserProfile = async (req, res) => {
   try {
@@ -104,52 +118,43 @@ export const updateUserProfile = async (req, res) => {
 
 export const searchUsers = async (req, res) => {
   try {
-    const searchQuery = req.query.q;
-
-    if (!searchQuery) {
+    const query = req.query.q;
+    
+    if (!query || query.trim() === '') {
       return res.status(400).json({ message: 'Search query is required' });
     }
 
-    const searchRegex = new RegExp(searchQuery, 'i');
+    const users = await User.find({
+      username: { $regex: query, $options: 'i' }
+    }, 'username bio profileImageUrl')
+    .limit(10);
 
-    const users = await User.find({ 
-      username: searchRegex,
-      _id: { $ne: req.user.id }
-    }).select('username profileImageUrl');
-
-    res.status(200).json(users);
-
+    res.json(users);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server Error' });
   }
 };
 
-
-// --- NEW: Update Profile Picture Function ---
-// @desc    Update user profile picture URL
-// @route   PUT /api/users/profile/picture
-// @access  Private
 export const updateProfilePicture = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
 
-    if (user) {
-      // Get the image URL from the request body
-      user.profileImageUrl = req.body.imageUrl || user.profileImageUrl;
-
-      const updatedUser = await user.save();
-
-      // Send back the relevant parts of the updated user
-      res.json({
-        _id: updatedUser._id,
-        username: updatedUser.username,
-        email: updatedUser.email,
-        profileImageUrl: updatedUser.profileImageUrl,
-      });
-    } else {
-      res.status(404).json({ message: 'User not found' });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
     }
+
+    user.profileImageUrl = req.body.profileImageUrl;
+    await user.save();
+
+    res.json({
+      _id: user._id,
+      username: user.username,
+      email: user.email,
+      bio: user.bio,
+      skills: user.skills,
+      profileImageUrl: user.profileImageUrl,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server Error' });
