@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getProfileImageUrl } from '../utils/imageUtils';
 
@@ -17,6 +17,7 @@ function NavItem({ icon, label, active, to }) {
 export default function Header() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -32,6 +33,12 @@ export default function Header() {
       setSearchQuery('');
     }
   };
+
+  // Determine active tab based on current location
+  const isHomeActive = location.pathname === '/';
+  const isMessagingActive = location.pathname === '/messages';
+  const isProfileActive = location.pathname.startsWith('/profile');
+  const isSearchActive = location.pathname === '/search';
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-200 px-4 py-2">
@@ -59,10 +66,10 @@ export default function Header() {
 
         {/* Center: Nav - Hidden on mobile */}
         <nav className="hidden md:flex gap-8">
-          <NavItem icon="fa-home" label="Home" active to="/" />
+          <NavItem icon="fa-home" label="Home" active={isHomeActive} to="/" />
           <NavItem icon="fa-user-friends" label="My Network" to="/network" />
           <NavItem icon="fa-briefcase" label="Jobs" to="/jobs" />
-          <NavItem icon="fa-comment-dots" label="Messaging" to="/messages" />
+          <NavItem icon="fa-comment-dots" label="Messaging" active={isMessagingActive} to="/messages" />
           <NavItem icon="fa-bell" label="Notifications" to="/notifications" />
         </nav>
 
@@ -106,8 +113,8 @@ export default function Header() {
       {isMobileMenuOpen && (
         <div className="md:hidden bg-white border-t border-gray-200 py-4">
           <div className="flex flex-col space-y-4">
-            <Link to="/" className="flex items-center gap-3 px-4 py-2 hover:bg-gray-50">
-              <i className="fas fa-home text-blue-700" />
+            <Link to="/" className={`flex items-center gap-3 px-4 py-2 hover:bg-gray-50 ${isHomeActive ? 'text-blue-700' : 'text-gray-500'}`}>
+              <i className="fas fa-home" />
               <span>Home</span>
             </Link>
             <Link to="/network" className="flex items-center gap-3 px-4 py-2 hover:bg-gray-50">
@@ -118,8 +125,8 @@ export default function Header() {
               <i className="fas fa-briefcase text-gray-500" />
               <span>Jobs</span>
             </Link>
-            <Link to="/messages" className="flex items-center gap-3 px-4 py-2 hover:bg-gray-50">
-              <i className="fas fa-comment-dots text-gray-500" />
+            <Link to="/messages" className={`flex items-center gap-3 px-4 py-2 hover:bg-gray-50 ${isMessagingActive ? 'text-blue-700' : 'text-gray-500'}`}>
+              <i className="fas fa-comment-dots" />
               <span>Messaging</span>
             </Link>
             <Link to="/notifications" className="flex items-center gap-3 px-4 py-2 hover:bg-gray-50">

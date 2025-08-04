@@ -7,6 +7,7 @@ import RegisterPage from './pages/RegisterPage';
 import ProfilePage from './pages/ProfilePage';
 import EditProfilePage from './pages/EditProfilePage';
 import SearchPage from './pages/SearchPage';
+import MessagingPage from './pages/MessagingPage';
 import ThemeTest from './components/ThemeTest';
 import DarkModeSummary from './components/DarkModeSummary';
 import ThemeVerifier from './components/ThemeVerifier';
@@ -33,6 +34,7 @@ function App() {
         <Route path="/profile/:username" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
         <Route path="/profile/edit" element={<ProtectedRoute><EditProfilePage /></ProtectedRoute>} />
         <Route path="/search" element={<ProtectedRoute><SearchPage /></ProtectedRoute>} />
+        <Route path="/messages" element={<ProtectedRoute><MessagingPage /></ProtectedRoute>} />
         <Route path="/theme-test" element={<DarkModeSummary />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />

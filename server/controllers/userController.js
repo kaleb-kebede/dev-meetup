@@ -1,14 +1,24 @@
 import User from '../models/User.js';
 import Post from '../models/Post.js';
 
-// Get all users for suggestions
+// Get all users for suggestions with current user's following info
 export const getAllUsers = async (req, res) => {
   try {
     const users = await User.find({}, 'username bio profileImageUrl createdAt')
       .sort({ createdAt: -1 })
       .limit(50); // Limit to prevent performance issues
 
-    res.status(200).json(users);
+    // Get current user's following list
+    const currentUser = await User.findById(req.user.id, 'following');
+    const followingIds = currentUser ? currentUser.following.map(id => id.toString()) : [];
+
+    // Add following status to each user
+    const usersWithFollowingStatus = users.map(user => ({
+      ...user.toObject(),
+      isFollowing: followingIds.includes(user._id.toString())
+    }));
+
+    res.status(200).json(usersWithFollowingStatus);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server Error' });

@@ -234,6 +234,372 @@ const fetchSuggestions = async () => {
 };
 ```
 
+### **10. Enhanced Suggestions with Follow Functionality**
+```jsx
+// Updated SuggestionsCard Component:
+- Filter out already followed users
+- Working follow/unfollow functionality
+- Optimistic UI updates
+- Real-time state management
+- Toast notifications for feedback
+```
+
+**Key Features:**
+- **Smart Filtering**: Excludes users already being followed
+- **Working Follow Buttons**: Real follow/unfollow functionality
+- **Optimistic Updates**: Immediate UI feedback
+- **State Management**: Proper following state tracking
+- **Toast Notifications**: Success/error feedback
+- **Auto-refresh**: Removes followed users from suggestions
+
+**Backend Enhancement:**
+```javascript
+// Updated getAllUsers controller with following status
+export const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find({}, 'username bio profileImageUrl createdAt')
+      .sort({ createdAt: -1 })
+      .limit(50);
+
+    // Get current user's following list
+    const currentUser = await User.findById(req.user.id, 'following');
+    const followingIds = currentUser ? currentUser.following.map(id => id.toString()) : [];
+
+    // Add following status to each user
+    const usersWithFollowingStatus = users.map(user => ({
+      ...user.toObject(),
+      isFollowing: followingIds.includes(user._id.toString())
+    }));
+
+    res.status(200).json(usersWithFollowingStatus);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+};
+```
+
+**Frontend Enhancement:**
+```javascript
+// Enhanced SuggestionsCard with follow functionality
+const [followingStates, setFollowingStates] = useState({});
+
+const fetchSuggestions = async () => {
+  const response = await api.get('/users');
+  const allUsers = response.data;
+  
+  // Filter out current user and already followed users
+  const otherUsers = allUsers.filter(user => 
+    user._id !== currentUser?._id && !user.isFollowing
+  );
+  
+  // Transform and set suggestions
+  const userSuggestions = otherUsers.map(user => ({
+    id: user._id,
+    name: user.username,
+    desc: user.bio || 'Software Developer',
+    avatar: getProfileImageUrl(user.profileImageUrl, user.username),
+    isFollowing: user.isFollowing || false
+  }));
+  
+  setSuggestions(userSuggestions);
+};
+
+const handleFollow = async (userId, userName) => {
+  try {
+    // Optimistic update
+    setFollowingStates(prev => ({
+      ...prev,
+      [userId]: !prev[userId]
+    }));
+
+    // Call the follow API
+    await api.put(`/users/${userId}/follow`);
+    
+    // Show success message
+    const isNowFollowing = !followingStates[userId];
+    toast.success(isNowFollowing ? `Started following ${userName}` : `Unfollowed ${userName}`);
+    
+    // Refresh suggestions to remove followed users
+    if (isNowFollowing) {
+      setTimeout(() => {
+        fetchSuggestions();
+      }, 1000);
+    }
+  } catch (error) {
+    // Revert optimistic update on error
+    setFollowingStates(prev => ({
+      ...prev,
+      [userId]: !prev[userId]
+    }));
+    toast.error('Failed to follow user. Please try again.');
+  }
+};
+```
+
+### **11. Messaging Page Implementation**
+```jsx
+// New MessagingPage Component:
+- Header navigation integration
+- Two-column layout (3/4 left, 1/4 right)
+- User selection sidebar (1/4 of left column)
+- Messaging area (3/4 of left column)
+- Real-time message updates
+- Responsive design
+```
+
+**Key Features:**
+- **Header Integration**: Consistent navigation with header visible
+- **Layout Structure**: 3/4 left sidebar, 1/4 right sidebar
+- **User Selection**: Left column with user list for chat selection
+- **Messaging Interface**: Right column with chat messages and input
+- **Real-time Updates**: Polling for new messages every 5 seconds
+- **Responsive Design**: Mobile-friendly layout with mobile navigation
+- **Message Functionality**: Send and receive messages with proper API integration
+
+**Layout Structure:**
+```jsx
+// Main layout grid
+<div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+  {/* Left Sidebar - 3/4 width */}
+  <div className="lg:col-span-3">
+    <div className="grid grid-cols-4 h-[calc(100vh-200px)]">
+      {/* User Selection - 1/4 width */}
+      <div className="col-span-1 border-r">
+        {/* User list with selection */}
+      </div>
+      
+      {/* Messaging Area - 3/4 width */}
+      <div className="col-span-3 flex flex-col">
+        {/* Chat header, messages, input */}
+      </div>
+    </div>
+  </div>
+  
+  {/* Right Sidebar - 1/4 width */}
+  <div className="lg:col-span-1">
+    {/* Quick actions */}
+  </div>
+</div>
+```
+
+**Technical Implementation:**
+```javascript
+// MessagingPage component structure
+const [users, setUsers] = useState([]);
+const [selectedUser, setSelectedUser] = useState(null);
+const [messages, setMessages] = useState([]);
+const [newMessage, setNewMessage] = useState('');
+
+// Fetch users for selection
+const fetchUsers = async () => {
+  const response = await api.get('/users');
+  const allUsers = response.data.filter(user => user._id !== currentUser?._id);
+  setUsers(allUsers);
+};
+
+// Fetch messages for selected user
+const fetchMessages = async (otherUserId) => {
+  const response = await api.get(`/messages/${otherUserId}`);
+  setMessages(response.data);
+};
+
+// Send message functionality
+const handleSendMessage = async (e) => {
+  await api.post('/messages', {
+    receiver: selectedUser._id,
+    content: newMessage
+  });
+  setNewMessage('');
+  fetchMessages(selectedUser._id);
+};
+```
+
+**Backend Integration:**
+```javascript
+// Message routes in messages.js
+router.post('/', protect, sendMessage);
+router.get('/:userId', protect, getMessages);
+
+// Message controller functions
+export const sendMessage = async (req, res) => {
+  const { receiver, content } = req.body;
+  const sender = req.user._id;
+  const message = new Message({ sender, receiver, content });
+  await message.save();
+  res.status(201).json(message);
+};
+
+export const getMessages = async (req, res) => {
+  const { userId } = req.params;
+  const myId = req.user._id;
+  const messages = await Message.find({
+    $or: [
+      { sender: myId, receiver: userId },
+      { sender: userId, receiver: myId }
+    ]
+  }).sort({ createdAt: 1 });
+  res.json(messages);
+};
+```
+
+### **12. Enhanced Messaging Page Layout**
+```jsx
+// Updated MessagingPage Component:
+- Non-scrollable page design
+- Scrollable user selection column
+- Fixed height layout fitting bottom section
+- Active tab indicator in header
+- Proper flex layout structure
+```
+
+**Key Improvements:**
+- **Non-Scrollable Design**: Page uses `h-screen` and `overflow-hidden` to prevent page scrolling
+- **Scrollable User Selection**: User list column has `overflow-y-auto` for internal scrolling
+- **Fixed Layout**: Uses flexbox to ensure proper height distribution
+- **Active Tab Indicator**: Header shows messaging tab as active when on messaging page
+- **Bottom Section Fit**: Layout properly fits within viewport without overflow
+
+**Layout Structure:**
+```jsx
+// Non-scrollable container
+<div className="h-screen flex flex-col bg-gray-50 dark:bg-gray-900 overflow-hidden">
+  {/* Header */}
+  <Header />
+  
+  {/* Main Content - Non-scrollable container */}
+  <div className="flex-1 max-w-7xl mx-auto px-4 py-6 overflow-hidden">
+    <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 h-full">
+      {/* Left Sidebar - 3/4 width */}
+      <div className="lg:col-span-3 h-full">
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm h-full flex flex-col">
+          <div className="grid grid-cols-4 h-full">
+            {/* User Selection - Scrollable */}
+            <div className="col-span-1 border-r flex flex-col">
+              <div className="p-4 border-b flex-shrink-0">
+                <h2>Messages</h2>
+              </div>
+              <div className="flex-1 overflow-y-auto">
+                {/* Scrollable user list */}
+              </div>
+            </div>
+            
+            {/* Messaging Area - Fixed structure */}
+            <div className="col-span-3 flex flex-col">
+              {/* Chat header - Fixed */}
+              <div className="p-4 border-b flex-shrink-0">
+                {/* User info */}
+              </div>
+              
+              {/* Messages - Scrollable */}
+              <div className="flex-1 overflow-y-auto p-4">
+                {/* Messages list */}
+              </div>
+              
+              {/* Input - Fixed at bottom */}
+              <div className="p-4 border-t flex-shrink-0">
+                {/* Message input form */}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      {/* Right Sidebar - 1/4 width */}
+      <div className="lg:col-span-1 h-full">
+        {/* Quick actions */}
+      </div>
+    </div>
+  </div>
+</div>
+```
+
+**Header Active Tab Implementation:**
+```javascript
+// Header component with active tab detection
+import { useLocation } from 'react-router-dom';
+
+export default function Header() {
+  const location = useLocation();
+  
+  // Determine active tab based on current location
+  const isHomeActive = location.pathname === '/';
+  const isMessagingActive = location.pathname === '/messages';
+  const isProfileActive = location.pathname.startsWith('/profile');
+  const isSearchActive = location.pathname === '/search';
+
+  return (
+    <nav className="hidden md:flex gap-8">
+      <NavItem icon="fa-home" label="Home" active={isHomeActive} to="/" />
+      <NavItem icon="fa-user-friends" label="My Network" to="/network" />
+      <NavItem icon="fa-briefcase" label="Jobs" to="/jobs" />
+      <NavItem icon="fa-comment-dots" label="Messaging" active={isMessagingActive} to="/messages" />
+      <NavItem icon="fa-bell" label="Notifications" to="/notifications" />
+    </nav>
+  );
+}
+```
+
+**Technical Benefits:**
+- **Better UX**: Non-scrollable design prevents layout issues
+- **Proper Scrolling**: Only necessary areas scroll (user list, messages)
+- **Fixed Elements**: Header, input, and chat header stay in place
+- **Responsive**: Works on all screen sizes with proper height management
+- **Visual Feedback**: Active tab indicator provides clear navigation state
+
+### **10. Comment Functionality Fix**
+```jsx
+// Fixed Comment Toggle in MainFeed Component:
+- Proper state management for comment visibility
+- Working comment toggle functionality
+- Real-time comment updates
+- Comment count display
+```
+
+**Key Features:**
+- **State Management**: Added `openCommentPostId` state to track which post has comments open
+- **Toggle Functionality**: `handleToggleComments` function to open/close comment sections
+- **Real-time Updates**: Comments refresh when new comments are added
+- **Comment Count**: Shows number of comments on each post
+- **Proper Integration**: CommentSection component properly integrated
+
+**Technical Implementation:**
+```javascript
+// MainFeed component - Comment state management
+const [openCommentPostId, setOpenCommentPostId] = useState(null);
+
+const handleToggleComments = (postId) => {
+  setOpenCommentPostId(prevId => (prevId === postId ? null : postId));
+};
+
+const handleCommentAdded = (postId) => {
+  fetchPosts(); // Refresh posts to get updated comment count
+};
+
+// PostItem integration
+<PostItem 
+  key={post._id} 
+  post={post} 
+  onLike={handleLike}
+  onCommentAdded={() => handleCommentAdded(post._id)}
+  onToggleComments={handleToggleComments}
+  isCommentsOpen={openCommentPostId === post._id}
+  onDelete={handleDelete}
+  onUpdate={handleUpdate}
+/>
+```
+
+**Backend Support:**
+```javascript
+// Comment routes in posts.js
+router.route('/:postId/comments')
+  .post(protect, addComment)
+  .get(getCommentsForPost);
+
+router.route('/:postId/comments/:commentId/reply')
+  .post(protect, addReplyToComment);
+```
+
 ## 🎨 **Design System Improvements**
 
 ### **1. Color Palette & Gradients**

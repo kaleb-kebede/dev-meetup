@@ -9,6 +9,7 @@ export default function MainFeed() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [openCommentPostId, setOpenCommentPostId] = useState(null);
   const { user } = useAuth();
 
   const fetchPosts = useCallback(async () => {
@@ -120,6 +121,14 @@ export default function MainFeed() {
     }
   };
 
+  const handleToggleComments = (postId) => {
+    setOpenCommentPostId(prevId => (prevId === postId ? null : postId));
+  };
+
+  const handleCommentAdded = (postId) => {
+    fetchPosts(); // Refresh posts to get updated comment count
+  };
+
   if (loading) {
     return (
       <div className="flex flex-col gap-4">
@@ -170,9 +179,9 @@ export default function MainFeed() {
             key={post._id} 
             post={post} 
             onLike={handleLike}
-            onCommentAdded={() => fetchPosts()}
-            onToggleComments={() => {}}
-            isCommentsOpen={false}
+            onCommentAdded={() => handleCommentAdded(post._id)}
+            onToggleComments={handleToggleComments}
+            isCommentsOpen={openCommentPostId === post._id}
             onDelete={handleDelete}
             onUpdate={handleUpdate}
           />
