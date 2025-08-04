@@ -29,4 +29,26 @@ api.interceptors.request.use(
   }
 );
 
+
+// Direct Messaging API
+export const getMessages = async (otherUserId) => {
+  try {
+    const res = await api.get(`/messages/${otherUserId}`);
+    return res.data;
+  } catch (err) {
+    console.error('Error fetching messages:', err);
+    throw new Error(err.response?.data?.error || 'Failed to fetch messages');
+  }
+};
+
+export const sendMessage = async (receiverId, content) => {
+  try {
+    const res = await api.post('/messages', { receiver: receiverId, content });
+    return res.data;
+  } catch (err) {
+    console.error('Error sending message:', err);
+    throw new Error(err.response?.data?.error || 'Failed to send message');
+  }
+};
+
 export default api;

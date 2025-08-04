@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import DirectMessage from '../components/DirectMessage';
 import { useParams, Link } from 'react-router-dom';
 import api from '../services/api';
 import PostItem from '../components/PostItem';
@@ -13,6 +14,7 @@ const ProfilePage = () => {
   const [profileData, setProfileData] = useState({ profile: null, posts: [] });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showMessageModal, setShowMessageModal] = useState(false);
 
   const fetchProfileData = useCallback(async () => {
     try {
@@ -83,6 +85,20 @@ const ProfilePage = () => {
 
   return (
     <div className="max-w-4xl mx-auto">
+             {/* Direct Message Modal */}
+       {showMessageModal && (
+         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+           <div className="bg-transparent rounded-xl shadow-lg p-2 relative w-full max-w-2xl">
+             <button
+               className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 dark:hover:text-white bg-white dark:bg-gray-800 rounded-full w-8 h-8 flex items-center justify-center shadow-lg z-10"
+               onClick={() => setShowMessageModal(false)}
+             >
+               &times;
+             </button>
+             <DirectMessage currentUserId={currentUser._id} otherUserId={profile._id} otherUserName={profile.username} />
+           </div>
+         </div>
+       )}
       {/* Profile Header Card */}
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-8 mb-8">
         <div className="flex flex-col md:flex-row items-center md:items-start space-y-6 md:space-y-0 md:space-x-8">
@@ -133,18 +149,26 @@ const ProfilePage = () => {
             </p>
           </div>
 
-          {/* Action Button */}
+          {/* Action Buttons */}
           {!isOwnProfile && currentUser && (
-            <button 
-              onClick={handleFollow}
-              className={`px-8 py-3 rounded-xl font-semibold transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105 ${
-                isFollowing 
-                  ? 'bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-700 text-gray-800 dark:text-white' 
-                  : 'bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white'
-              }`}
-            >
-              {isFollowing ? 'Unfollow' : 'Follow'}
-            </button>
+            <div className="flex flex-col gap-2">
+              <button 
+                onClick={handleFollow}
+                className={`px-8 py-3 rounded-xl font-semibold transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105 ${
+                  isFollowing 
+                    ? 'bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-700 text-gray-800 dark:text-white' 
+                    : 'bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white'
+                }`}
+              >
+                {isFollowing ? 'Unfollow' : 'Follow'}
+              </button>
+              <button
+                onClick={() => setShowMessageModal(true)}
+                className="px-8 py-3 rounded-xl font-semibold bg-gradient-to-r from-green-500 to-blue-500 text-white shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200"
+              >
+                Message
+              </button>
+            </div>
           )}
         </div>
       </div>

@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+// ...existing code...
+import DirectMessage from './DirectMessage';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import CommentSection from './CommentSection';
@@ -16,6 +18,7 @@ const PostItem = ({ post, onLike, onCommentAdded, onToggleComments, isCommentsOp
   const [editedImageUrl, setEditedImageUrl] = useState(post.imageUrl || '');
   const [editedCodeSnippet, setEditedCodeSnippet] = useState(post.codeSnippet || { code: '', language: 'javascript', title: '' });
   const [showOptions, setShowOptions] = useState(false);
+  const [showMessageModal, setShowMessageModal] = useState(false);
 
   const formatDate = (dateString) => {
     const seconds = Math.floor((new Date() - new Date(dateString)) / 1000);
@@ -44,10 +47,25 @@ const PostItem = ({ post, onLike, onCommentAdded, onToggleComments, isCommentsOp
   };
 
   const handleRepost = () => toast('Repost feature coming soon!');
-  const handleSend = () => toast('Send feature coming soon!');
+  // const { user } = useAuth();
+  const handleSend = () => setShowMessageModal(true);
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+             {/* Direct Message Modal */}
+       {showMessageModal && (
+         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+           <div className="bg-transparent rounded-xl shadow-lg p-2 relative w-full max-w-2xl">
+             <button
+               className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 dark:hover:text-white bg-white dark:bg-gray-800 rounded-full w-8 h-8 flex items-center justify-center shadow-lg z-10"
+               onClick={() => setShowMessageModal(false)}
+             >
+               &times;
+             </button>
+             <DirectMessage currentUserId={user._id} otherUserId={post.user._id} otherUserName={post.user.username} />
+           </div>
+         </div>
+       )}
       {/* Post Header */}
       <div className="p-6 border-b border-gray-100 dark:border-gray-700">
         <div className="flex items-start justify-between">

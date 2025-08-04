@@ -10,6 +10,7 @@ import authRoutes from "./routes/auth.js";
 import postRoutes from './routes/posts.js'; // 1. Import post routes
 import userRoutes from './routes/users.js'; // 1. Import user routes
 import uploadRoutes from './routes/upload.js'; // 2. Import upload routes
+import messageRoutes from './routes/messages.js'; // Direct messaging routes
 
 // import { InsertMany } from "./models/User.js";
 // import allDocs from "./models/viewDoc.js";
@@ -46,6 +47,7 @@ app.use("/api/auth", authRoutes);
 app.use('/api/posts', postRoutes); // 2. Use post routes
 app.use('/api/users', userRoutes); // 2. Use user routes
 app.use('/api/upload', uploadRoutes); // 3. Use the new upload routes
+app.use('/api/messages', messageRoutes); // Direct messaging API
 
 // --- Make 'uploads' folder static ---
 // 4. This makes the /uploads folder accessible to the public
