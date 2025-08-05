@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import crypto from 'crypto'; // Import crypto for token generation
 
 const UserSchema = new mongoose.Schema({
   username: {
@@ -43,9 +44,29 @@ const UserSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
   }],
+    // --- NEW FIELDS FOR PASSWORD RESET ---
+  passwordResetToken: String,
+  passwordResetExpires: Date,
 }, {
   timestamps: true,
 });
+
+// --- NEW METHOD to generate reset token ---
+UserSchema.methods.getPasswordResetToken = function() {
+  // Generate token
+  const resetToken = crypto.randomBytes(20).toString('hex');
+
+  // Hash token and set to passwordResetToken field
+  this.passwordResetToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
+
+  // Set expire time (e.g., 10 minutes)
+  this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+
+  return resetToken; // Return the unhashed token
+};
 
 const User = mongoose.model('User', UserSchema);
 

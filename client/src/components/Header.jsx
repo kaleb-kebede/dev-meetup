@@ -66,7 +66,7 @@ export default function Header() {
 
         {/* Center: Nav - Hidden on mobile */}
         <nav className="hidden md:flex gap-8">
-          <NavItem icon="fa-home" label="Home" active={isHomeActive} to="/" />
+          <NavItem icon="fa-home" label="Home" active={isHomeActive} to="/home" />
           <NavItem icon="fa-user-friends" label="My Network" to="/network" />
           <NavItem icon="fa-briefcase" label="Jobs" to="/jobs" />
           <NavItem icon="fa-comment-dots" label="Messaging" active={isMessagingActive} to="/messages" />
