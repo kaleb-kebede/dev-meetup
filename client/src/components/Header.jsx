@@ -175,15 +175,29 @@ export default function Header() {
       <div className="flex items-center justify-between max-w-7xl mx-auto">
         {/* Left: Logo + Search */}
         <div className="flex items-center gap-6">
-          <Link to="/" className="flex items-center space-x-3 group">
-            <div className="w-11 h-11 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105 group-hover:rotate-3">
-              <i className="fas fa-code text-white text-lg"></i>
+          <Link 
+            to="/" 
+            className="flex items-center space-x-3 group relative"
+            title="DevMeetup - Return to Homepage"
+          >
+            <div className="w-11 h-11 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105 group-hover:rotate-3 ring-2 ring-transparent group-hover:ring-blue-500/20">
+              <i className="fas fa-home text-white text-lg"></i>
             </div>
             <div className="hidden sm:block">
-              <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+              <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent group-hover:from-blue-700 group-hover:to-indigo-700 transition-all duration-300">
                 DevMeetup
               </span>
-              <div className={`text-xs -mt-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-500'}`}>Developer Community</div>
+              <div className={`text-xs -mt-1 transition-colors duration-300 ${
+                isDarkMode 
+                  ? 'text-gray-300 group-hover:text-blue-300' 
+                  : 'text-gray-500 group-hover:text-blue-600'
+              }`}>Developer Community</div>
+            </div>
+            
+            {/* Tooltip for better UX */}
+            <div className="absolute -bottom-12 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-3 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap z-50">
+              <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-gray-900 rotate-45"></div>
+              Click to return home
             </div>
           </Link>
           

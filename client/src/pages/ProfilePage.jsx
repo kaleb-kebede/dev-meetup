@@ -6,6 +6,7 @@ import PostItem from '../components/PostItem';
 import { useAuth } from '../context/AuthContext';
 import Spinner from '../components/Spinner';
 import GitHubCard from '../components/GitHubCard';
+import Layout from '../components/Layout';
 import { getProfileImageUrl } from '../utils/imageUtils';
 import { getFullName, getHandle } from '../utils/userUtils';
 
@@ -85,8 +86,18 @@ const ProfilePage = () => {
   const isFollowing = currentUser && profile.followers.includes(currentUser._id);
   const isOwnProfile = currentUser && currentUser._id === profile._id;
 
+  const breadcrumbs = [
+    { label: 'Home', href: '/', icon: 'fas fa-home' },
+    { label: 'Developers', href: '/network', icon: 'fas fa-users-cog' },
+    { label: profile.username, icon: 'fas fa-user' }
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <Layout 
+      title={`${getFullName(profile)} (@${profile.username})`}
+      breadcrumbs={breadcrumbs}
+      showMobileNav={true}
+    >
       {/* Direct Message Modal */}
       {showMessageModal && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
@@ -407,7 +418,7 @@ const ProfilePage = () => {
           </div>
         </div>
       </div>
-    </div>
+    </Layout>
   );
 };
 
