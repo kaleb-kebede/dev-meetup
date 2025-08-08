@@ -2,6 +2,16 @@ import mongoose from 'mongoose';
 import crypto from 'crypto'; // Import crypto for token generation
 
 const UserSchema = new mongoose.Schema({
+  firstName: {
+    type: String,
+    required: [true, 'Please provide a first name'],
+    trim: true,
+  },
+  lastName: {
+    type: String,
+    required: [true, 'Please provide a last name'],
+    trim: true,
+  },
   username: {
     type: String,
     required: [true, 'Please provide a username'],

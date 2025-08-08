@@ -16,10 +16,10 @@ const generateToken = (id) => {
 // @access  Public
 export const registerUser = async (req, res) => {
   try {
-    const { username, email, password } = req.body;
+    const { firstName, lastName, username, email, password } = req.body;
 
     // 1. Basic validation
-    if (!username || !email || !password) {
+    if (!firstName || !lastName || !username || !email || !password) {
       return res.status(400).json({ message: "Please enter all fields" });
     }
 
@@ -35,6 +35,8 @@ export const registerUser = async (req, res) => {
 
     // 4. Create the new user in the database
     const user = await User.create({
+      firstName,
+      lastName,
       username,
       email,
       password: hashedPassword,
@@ -44,6 +46,8 @@ export const registerUser = async (req, res) => {
     if (user) {
       res.status(201).json({
         _id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
         username: user.username,
         email: user.email,
         profileImageUrl: user.profileImageUrl,
@@ -73,6 +77,8 @@ export const loginUser = async (req, res) => {
       // 3. If credentials are correct, send back user data and a token
       res.json({
         _id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
         username: user.username,
         email: user.email,
         profileImageUrl: user.profileImageUrl,

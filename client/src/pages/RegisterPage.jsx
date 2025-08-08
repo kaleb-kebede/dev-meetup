@@ -5,6 +5,8 @@ import toast from 'react-hot-toast';
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
     username: '',
     email: '',
     password: '',
@@ -12,7 +14,7 @@ const RegisterPage = () => {
   });
   const navigate = useNavigate();
 
-  const { username, email, password, password2 } = formData;
+  const { firstName, lastName, username, email, password, password2 } = formData;
 
   const onChange = (e) => {
     setFormData((prevState) => ({
@@ -28,6 +30,8 @@ const RegisterPage = () => {
     } else {
       try {
         const userData = {
+          firstName,
+          lastName,
           username,
           email,
           password,
@@ -50,6 +54,34 @@ const RegisterPage = () => {
           Register
         </h1>
         <form onSubmit={onSubmit}>
+          <div className="mb-4">
+            <label htmlFor="firstName" className="block text-gray-600 dark:text-gray-300 mb-2">
+              First name
+            </label>
+            <input
+              type="text"
+              id="firstName"
+              name="firstName"
+              value={firstName}
+              onChange={onChange}
+              required
+              className="w-full px-3 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 dark:focus:ring-cyan-400"
+            />
+          </div>
+          <div className="mb-4">
+            <label htmlFor="lastName" className="block text-gray-600 dark:text-gray-300 mb-2">
+              Last name
+            </label>
+            <input
+              type="text"
+              id="lastName"
+              name="lastName"
+              value={lastName}
+              onChange={onChange}
+              required
+              className="w-full px-3 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 dark:focus:ring-cyan-400"
+            />
+          </div>
           <div className="mb-4">
             <label htmlFor="username" className="block text-gray-600 dark:text-gray-300 mb-2">
               Username
