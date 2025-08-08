@@ -41,13 +41,19 @@ export default function Header() {
   const isSearchActive = location.pathname === '/search';
 
   return (
-    <header className="sticky top-0 z-50 bg-white border-b border-gray-200 px-4 py-2">
-      <div className="flex items-center justify-between">
+    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-200/50 shadow-lg px-4 py-3">
+      <div className="flex items-center justify-between max-w-7xl mx-auto">
         {/* Left: Logo + Search */}
-        <div className="flex items-center gap-4">
-          <Link to="/home" className="flex items-center space-x-2">
-            <div className="w-9 h-9 bg-gradient-to-r from-blue-500 to-blue-600 rounded flex items-center justify-center">
-              <span className="text-white font-bold text-sm">dm</span>
+        <div className="flex items-center gap-6">
+          <Link to="/home" className="flex items-center space-x-3 group">
+            <div className="w-11 h-11 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
+              <i className="fas fa-code text-white text-lg"></i>
+            </div>
+            <div className="hidden sm:block">
+              <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                DevMeetup
+              </span>
+              <div className="text-xs text-gray-500 -mt-1">Developer Community</div>
             </div>
           </Link>
           <form onSubmit={handleSearch} className="relative hidden sm:block">
@@ -55,10 +61,10 @@ export default function Header() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="bg-gray-100 rounded-full pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white"
-              placeholder="Search"
+              className="bg-gray-50/80 backdrop-blur-sm rounded-xl pl-12 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white/90 border border-gray-200/50 w-80 transition-all duration-200 hover:bg-white/90"
+              placeholder="Search developers, posts, technologies..."
             />
-            <span className="absolute left-3 top-2.5 text-gray-500">
+            <span className="absolute left-4 top-3.5 text-gray-400">
               <i className="fas fa-search" />
             </span>
           </form>

@@ -33,14 +33,15 @@ function App() {
       
       {/* Routes */}
       <Routes>
-         {/* Set up routes for logged-in users */}
+        {/* Set up routes for logged-in users */}
+        <Route path="/" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
         <Route path="/home" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
         <Route path="/profile/:username" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
         <Route path="/profile/edit" element={<ProtectedRoute><EditProfilePage /></ProtectedRoute>} />
         <Route path="/search" element={<ProtectedRoute><SearchPage /></ProtectedRoute>} />
 
         {/* Set up routes for logged-out users */}
-        <Route path="/" element={<WelcomePage />} />
+        <Route path="/welcome" element={<WelcomePage />} />
         <Route path="/messages" element={<ProtectedRoute><MessagingPage /></ProtectedRoute>} />
         <Route path="/theme-test" element={<DarkModeSummary />} />
         <Route path="/login" element={<LoginPage />} />
