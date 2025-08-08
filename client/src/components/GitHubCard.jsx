@@ -61,42 +61,52 @@ export default function GitHubCard({ user, isOwn = false }) {
   }
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4">
-      <div className="flex items-center justify-between mb-4">
+    <div className="bg-gradient-to-br from-white to-gray-50 rounded-xl border border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300 p-6">
+      <div className="flex items-center justify-between mb-6">
         <div className="flex items-center">
-          <i className="fab fa-github text-gray-700 text-lg mr-2"></i>
-          <h3 className="text-sm font-semibold text-gray-900">GitHub</h3>
+          <div className="w-8 h-8 bg-gradient-to-r from-gray-800 to-gray-900 rounded-lg flex items-center justify-center mr-3">
+            <i className="fab fa-github text-white text-lg"></i>
+          </div>
+          <h3 className="text-lg font-bold text-gray-900">GitHub Profile</h3>
         </div>
         <a
           href={user.githubData.profileUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-gray-600 hover:text-gray-900 transition-colors duration-200"
+          className="text-gray-500 hover:text-gray-800 p-2 rounded-lg hover:bg-gray-100 transition-all duration-200"
+          title="View GitHub Profile"
         >
-          <i className="fas fa-external-link-alt text-xs"></i>
+          <i className="fas fa-external-link-alt text-sm"></i>
         </a>
       </div>
 
       {/* GitHub Profile Info */}
-      <div className="flex items-center mb-4">
-        <img
-          src={user.githubData.avatarUrl}
-          alt={user.githubData.username}
-          className="w-8 h-8 rounded-full mr-3"
-        />
-        <div>
-          <div className="text-sm font-medium text-gray-900">
-            {user.githubData.username}
+      <div className="bg-gray-50 rounded-lg p-4 mb-6">
+        <div className="flex items-center mb-3">
+          <img
+            src={user.githubData.avatarUrl}
+            alt={user.githubData.username}
+            className="w-10 h-10 rounded-full mr-3 ring-2 ring-gray-200"
+          />
+          <div>
+            <div className="font-semibold text-gray-900">
+              @{user.githubData.username}
+            </div>
+            <div className="text-xs text-gray-500">
+              {user.githubData.followers || 0} followers
+            </div>
           </div>
-          <div className="flex items-center text-xs text-gray-500">
-            <span className="mr-3">
-              <i className="fas fa-code-branch mr-1"></i>
-              {user.githubData.publicRepos}
-            </span>
-            <span>
-              <i className="fas fa-star mr-1"></i>
-              {user.githubStats?.totalStars || 0}
-            </span>
+        </div>
+        
+        {/* GitHub Stats Grid */}
+        <div className="grid grid-cols-2 gap-4 text-center">
+          <div className="bg-white rounded-lg p-3 shadow-sm">
+            <div className="text-xl font-bold text-blue-600">{user.githubData.publicRepos}</div>
+            <div className="text-xs text-gray-500 font-medium">Repositories</div>
+          </div>
+          <div className="bg-white rounded-lg p-3 shadow-sm">
+            <div className="text-xl font-bold text-yellow-500">{user.githubStats?.totalStars || 0}</div>
+            <div className="text-xs text-gray-500 font-medium">Total Stars</div>
           </div>
         </div>
       </div>
