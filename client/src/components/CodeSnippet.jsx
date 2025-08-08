@@ -46,15 +46,52 @@ const CodeSnippet = ({ code, language, title }) => {
   const needsCollapsing = shouldCollapseCode(code);
 
   return (
-    <div className="my-4 rounded-lg overflow-hidden border border-gray-200">
-      {title && (
-        <div className="bg-gray-50 px-4 py-2 border-b border-gray-200">
-          <h4 className="text-sm font-medium text-gray-700">
-            {title}
-          </h4>
+    <div className="my-4 rounded-2xl overflow-hidden border border-gray-200 shadow-lg bg-white">
+      {/* Terminal-style Header */}
+      <div className="bg-gradient-to-r from-gray-800 to-gray-900 px-4 py-3 flex items-center justify-between">
+        <div className="flex items-center space-x-3">
+          <div className="flex space-x-2">
+            <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+            <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+          </div>
+          <div className="text-gray-300 text-sm font-mono">
+            <i className="fas fa-terminal mr-2"></i>
+            {title || `main.${language || 'js'}`}
+          </div>
         </div>
-      )}
-      <div className="relative">
+        <div className="flex items-center space-x-2">
+          {/* Language Badge */}
+          <span className="bg-blue-600 text-white text-xs px-3 py-1 rounded-full font-mono font-semibold flex items-center">
+            <i className="fas fa-code mr-1"></i>
+            {language || 'javascript'}
+          </span>
+          {/* Copy Button */}
+          <button
+            onClick={handleCopy}
+            className="bg-gray-700 hover:bg-gray-600 text-white text-xs px-3 py-1 rounded-lg transition-colors duration-200 flex items-center space-x-1 font-mono"
+            title="Copy code"
+          >
+            {copied ? (
+              <>
+                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+                <span>Copied!</span>
+              </>
+            ) : (
+              <>
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+                <span>Copy</span>
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+      
+      <div className="relative bg-gray-50">
         <SyntaxHighlighter
           language={language || 'javascript'}
           style={tomorrow}
@@ -62,45 +99,17 @@ const CodeSnippet = ({ code, language, title }) => {
             margin: 0,
             borderRadius: 0,
             fontSize: '14px',
-            lineHeight: '1.5',
+            lineHeight: '1.6',
             maxHeight: isCodeExpanded ? 'none' : '400px',
             overflow: 'hidden',
+            background: '#1a1b26',
+            padding: '1.5rem',
           }}
           showLineNumbers={true}
           wrapLines={true}
         >
           {displayCode}
         </SyntaxHighlighter>
-        
-        {/* Language Badge */}
-        <div className="absolute top-2 right-2">
-          <span className="bg-gray-800 text-white text-xs px-2 py-1 rounded">
-            {language || 'javascript'}
-          </span>
-        </div>
-        
-        {/* Copy Button */}
-        <button
-          onClick={handleCopy}
-          className="absolute top-2 right-16 bg-gray-800 hover:bg-gray-700 text-white text-xs px-3 py-1 rounded transition-colors duration-200 flex items-center space-x-1"
-          title="Copy code"
-        >
-          {copied ? (
-            <>
-              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-              </svg>
-              <span>Copied!</span>
-            </>
-          ) : (
-            <>
-              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-              </svg>
-              <span>Copy</span>
-            </>
-          )}
-        </button>
 
         {/* Show More/Less Button for Code */}
         {needsCollapsing && (

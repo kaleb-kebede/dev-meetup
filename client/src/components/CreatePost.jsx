@@ -52,46 +52,46 @@ export default function CreatePost({ onPostCreated }) {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
           <button 
             onClick={() => setIsModalOpen(true)}
-            className="flex flex-col items-center gap-2 p-4 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all duration-200 group"
+            className="flex flex-col items-center gap-2 p-4 rounded-xl border border-gray-200 hover:border-blue-300 hover:bg-gradient-to-br hover:from-blue-50 hover:to-cyan-50 transition-all duration-300 group hover:shadow-md"
           >
-            <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
-              <i className="fas fa-code text-white"></i>
+            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg">
+              <i className="fas fa-code text-white text-lg"></i>
             </div>
-            <span className="text-sm font-medium text-gray-700 group-hover:text-blue-600">Code</span>
-            <span className="text-xs text-gray-500">Share snippets</span>
+            <span className="text-sm font-semibold text-gray-700 group-hover:text-blue-600">Code Snippet</span>
+            <span className="text-xs text-gray-500 text-center">Share & discuss code</span>
           </button>
           
           <button 
             onClick={() => setIsModalOpen(true)}
-            className="flex flex-col items-center gap-2 p-4 rounded-lg border border-gray-200 hover:border-green-300 hover:bg-green-50 transition-all duration-200 group"
+            className="flex flex-col items-center gap-2 p-4 rounded-xl border border-gray-200 hover:border-green-300 hover:bg-gradient-to-br hover:from-green-50 hover:to-emerald-50 transition-all duration-300 group hover:shadow-md"
           >
-            <div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
-              <i className="fas fa-folder-open text-white"></i>
+            <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg">
+              <i className="fas fa-rocket text-white text-lg"></i>
             </div>
-            <span className="text-sm font-medium text-gray-700 group-hover:text-green-600">Project</span>
-            <span className="text-xs text-gray-500">Showcase work</span>
+            <span className="text-sm font-semibold text-gray-700 group-hover:text-green-600">Project</span>
+            <span className="text-xs text-gray-500 text-center">Showcase your work</span>
           </button>
           
           <button 
             onClick={() => setIsModalOpen(true)}
-            className="flex flex-col items-center gap-2 p-4 rounded-lg border border-gray-200 hover:border-purple-300 hover:bg-purple-50 transition-all duration-200 group"
+            className="flex flex-col items-center gap-2 p-4 rounded-xl border border-gray-200 hover:border-purple-300 hover:bg-gradient-to-br hover:from-purple-50 hover:to-violet-50 transition-all duration-300 group hover:shadow-md"
           >
-            <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
-              <i className="fas fa-question-circle text-white"></i>
+            <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg">
+              <i className="fas fa-question-circle text-white text-lg"></i>
             </div>
-            <span className="text-sm font-medium text-gray-700 group-hover:text-purple-600">Question</span>
-            <span className="text-xs text-gray-500">Ask community</span>
+            <span className="text-sm font-semibold text-gray-700 group-hover:text-purple-600">Q&A</span>
+            <span className="text-xs text-gray-500 text-center">Ask the community</span>
           </button>
           
           <button 
             onClick={() => setIsModalOpen(true)}
-            className="flex flex-col items-center gap-2 p-4 rounded-lg border border-gray-200 hover:border-orange-300 hover:bg-orange-50 transition-all duration-200 group"
+            className="flex flex-col items-center gap-2 p-4 rounded-xl border border-gray-200 hover:border-orange-300 hover:bg-gradient-to-br hover:from-orange-50 hover:to-red-50 transition-all duration-300 group hover:shadow-md"
           >
-            <div className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
-              <i className="fas fa-image text-white"></i>
+            <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg">
+              <i className="fas fa-camera text-white text-lg"></i>
             </div>
-            <span className="text-sm font-medium text-gray-700 group-hover:text-orange-600">Media</span>
-            <span className="text-xs text-gray-500">Add images</span>
+            <span className="text-sm font-semibold text-gray-700 group-hover:text-orange-600">Media</span>
+            <span className="text-xs text-gray-500 text-center">Screenshots & demos</span>
           </button>
         </div>
         

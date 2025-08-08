@@ -63,7 +63,7 @@ const PostItem = ({ post, onLike, onCommentAdded, onToggleComments, isCommentsOp
   };
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+    <div className="bg-white rounded-2xl border border-gray-200/50 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group">
              {/* Direct Message Modal */}
        {showMessageModal && (
          <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
