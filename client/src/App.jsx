@@ -21,11 +21,11 @@ function App() {
   const { user } = useAuth();
 
   return (
-    <div className="min-h-screen bg-gray-100 text-gray-900 transition-colors duration-200">
+    <div className="min-h-screen">
       <Toaster 
         position="top-right"
         toastOptions={{
-          className: 'bg-white text-gray-900 shadow-lg border border-gray-200',
+          className: 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-lg border border-gray-200 dark:border-gray-600',
           duration: 4000,
         }}
       />

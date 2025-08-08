@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { getProfileImageUrl } from '../utils/imageUtils';
 import api from '../services/api';
 
@@ -36,27 +37,19 @@ function NavItem({ icon, label, active, to, color = 'blue' }) {
 
 export default function Header() {
   const { user, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    return localStorage.getItem('darkMode') === 'true';
-  });
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
   const [trendingRepos, setTrendingRepos] = useState([]);
   const [showDevTools, setShowDevTools] = useState(false);
   const [githubStatus, setGithubStatus] = useState({ connected: false, stats: null });
 
-  // Load theme on component mount
-  useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [isDarkMode]);
+  // Use theme from context
+  const isDarkMode = theme === 'dark';
 
   // Fetch notifications and GitHub status
   useEffect(() => {
@@ -146,15 +139,9 @@ export default function Header() {
     }
   };
 
-  const toggleDarkMode = () => {
-    const newDarkMode = !isDarkMode;
-    setIsDarkMode(newDarkMode);
-    localStorage.setItem('darkMode', newDarkMode.toString());
-    if (newDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
+  // Use global theme toggle
+  const handleToggleTheme = () => {
+    toggleTheme();
   };
 
   const markNotificationAsRead = (notificationId) => {
@@ -407,7 +394,7 @@ export default function Header() {
               
               {/* Dark Mode Toggle */}
               <button 
-                onClick={toggleDarkMode}
+                onClick={handleToggleTheme}
                 className={`p-2 rounded-lg transition-all duration-200 ${
                   isDarkMode 
                     ? 'text-yellow-400 hover:text-yellow-300 hover:bg-gray-800'
@@ -620,7 +607,7 @@ export default function Header() {
             
             {/* Mobile Dark Mode Toggle */}
             <button 
-              onClick={toggleDarkMode}
+              onClick={handleToggleTheme}
               className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-colors duration-200 ${
                 isDarkMode ? 'text-gray-300 hover:bg-gray-800' : 'text-gray-700 hover:bg-gray-50'
               }`}

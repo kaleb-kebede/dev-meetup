@@ -4,6 +4,7 @@ import CreatePost from './CreatePost';
 import PostItem from './PostItem';
 import PostSkeleton from './PostSkeleton';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 
 export default function MainFeed() {
   const [posts, setPosts] = useState([]);
@@ -11,6 +12,8 @@ export default function MainFeed() {
   const [error, setError] = useState(null);
   const [openCommentPostId, setOpenCommentPostId] = useState(null);
   const { user } = useAuth();
+  const { theme } = useTheme();
+  const isDarkMode = theme === 'dark';
 
   const fetchPosts = useCallback(async () => {
     try {
@@ -195,13 +198,19 @@ export default function MainFeed() {
       </div>
 
       {/* Featured Developers Section */}
-      <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-gray-200 shadow-lg p-6">
+      <div className={`backdrop-blur-sm rounded-2xl border shadow-lg p-6 ${
+        isDarkMode
+          ? 'bg-gray-800/80 border-gray-600'
+          : 'bg-white/80 border-gray-200'
+      }`}>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-lg flex items-center justify-center">
               <i className="fas fa-crown text-white text-sm"></i>
             </div>
-            <h3 className="text-lg font-bold text-gray-900">Featured Developers</h3>
+            <h3 className={`text-lg font-bold ${
+              isDarkMode ? 'text-gray-100' : 'text-gray-900'
+            }`}>Featured Developers</h3>
           </div>
           <button className="text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors">
             View all
