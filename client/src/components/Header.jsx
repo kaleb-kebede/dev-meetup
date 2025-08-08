@@ -3,13 +3,32 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getProfileImageUrl } from '../utils/imageUtils';
 
-function NavItem({ icon, label, active, to }) {
+function NavItem({ icon, label, active, to, color = 'blue' }) {
+  const colorMap = {
+    blue: { bg: 'bg-blue-500', hover: 'hover:bg-blue-600', text: 'text-blue-600' },
+    green: { bg: 'bg-green-500', hover: 'hover:bg-green-600', text: 'text-green-600' },
+    purple: { bg: 'bg-purple-500', hover: 'hover:bg-purple-600', text: 'text-purple-600' },
+    orange: { bg: 'bg-orange-500', hover: 'hover:bg-orange-600', text: 'text-orange-600' },
+    indigo: { bg: 'bg-indigo-500', hover: 'hover:bg-indigo-600', text: 'text-indigo-600' }
+  };
+  
+  const colors = colorMap[color];
+  
   return (
-    <Link to={to} className="flex flex-col items-center cursor-pointer group">
-      <span className={`text-xl mb-1 ${active ? 'text-blue-700' : 'text-gray-500 group-hover:text-blue-700'}`}>
-        <i className={`fas ${icon}`}></i>
-      </span>
-      <span className={`text-xs ${active ? 'text-black font-semibold underline underline-offset-4 decoration-2' : 'text-gray-600 group-hover:text-blue-700'}`}>{label}</span>
+    <Link to={to} className="group relative">
+      <div className={`
+        flex items-center gap-2 px-4 py-2 rounded-xl transition-all duration-300
+        ${active 
+          ? `${colors.bg} text-white shadow-lg transform scale-105` 
+          : `text-gray-600 hover:text-white ${colors.hover} hover:shadow-lg hover:transform hover:scale-105`
+        }
+      `}>
+        <i className={`${icon} text-lg`}></i>
+        <span className="font-medium text-sm hidden lg:block">{label}</span>
+      </div>
+      {active && (
+        <div className={`absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 ${colors.bg} rounded-full`}></div>
+      )}
     </Link>
   );
 }
@@ -71,37 +90,91 @@ export default function Header() {
         </div>
 
         {/* Center: Nav - Hidden on mobile */}
-        <nav className="hidden md:flex gap-8">
-          <NavItem icon="fa-home" label="Home" active={isHomeActive} to="/home" />
-          <NavItem icon="fa-user-friends" label="My Network" to="/network" />
-          <NavItem icon="fa-briefcase" label="Jobs" to="/jobs" />
-          <NavItem icon="fa-comment-dots" label="Messaging" active={isMessagingActive} to="/messages" />
-          <NavItem icon="fa-bell" label="Notifications" to="/notifications" />
+        <nav className="hidden md:flex gap-3">
+          <NavItem icon="fas fa-terminal" label="Feed" active={isHomeActive} to="/" color="blue" />
+          <NavItem icon="fas fa-code-branch" label="Projects" to="/projects" color="green" />
+          <NavItem icon="fas fa-users-cog" label="DevNetwork" to="/network" color="purple" />
+          <NavItem icon="fas fa-comments" label="Chat" active={isMessagingActive} to="/messages" color="orange" />
+          <NavItem icon="fas fa-rocket" label="Challenges" to="/challenges" color="indigo" />
         </nav>
 
-        {/* Right: Profile, Business, Premium */}
-        <div className="flex items-center gap-4">
+        {/* Right: Developer Tools */}
+        <div className="flex items-center gap-3">
           {user && (
             <>
-              <Link to={`/profile/${user.username}`} className="hidden sm:flex items-center gap-2">
-                <img 
-                  src={getProfileImageUrl(user.profileImageUrl, user.username)}
-                  alt="Profile"
-                  className="w-8 h-8 rounded-full object-cover"
-                  onError={(e) => {
-                    e.target.src = `https://placehold.co/32x32/60a5fa/fff?text=${user.username.charAt(0)}`;
-                  }}
-                />
-                <span className="text-sm text-gray-700">Me</span>
-              </Link>
-              <span className="hidden lg:inline text-sm text-gray-700 cursor-pointer">For Business</span>
-              <a href="#" className="hidden lg:inline text-yellow-700 font-semibold text-sm">Try Premium for $0</a>
-              <button 
-                onClick={handleLogout}
-                className="text-sm text-gray-700 hover:text-red-600"
-              >
-                Logout
+              {/* GitHub Status */}
+              <div className="hidden lg:flex items-center gap-2 px-3 py-1 bg-gray-100 rounded-lg">
+                <i className="fab fa-github text-gray-600"></i>
+                <span className="text-xs text-gray-600">
+                  {user.githubData?.username ? 'Connected' : 'Connect GitHub'}
+                </span>
+              </div>
+              
+              {/* Notifications */}
+              <button className="relative p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200">
+                <i className="fas fa-bell text-lg"></i>
+                <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full text-xs flex items-center justify-center text-white">3</span>
               </button>
+              
+              {/* Profile Dropdown */}
+              <div className="relative group">
+                <button className="flex items-center gap-2 p-1 rounded-lg hover:bg-gray-100 transition-all duration-200">
+                  <img 
+                    src={getProfileImageUrl(user.profileImageUrl, user.username)}
+                    alt="Profile"
+                    className="w-9 h-9 rounded-full object-cover ring-2 ring-gray-200"
+                    onError={(e) => {
+                      e.target.src = `https://placehold.co/36x36/60a5fa/fff?text=${user.username.charAt(0)}`;
+                    }}
+                  />
+                  <i className="fas fa-chevron-down text-xs text-gray-500 hidden sm:block"></i>
+                </button>
+                
+                {/* Dropdown Menu */}
+                <div className="absolute right-0 top-full mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-gray-200/50 backdrop-blur-sm opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 translate-y-2">
+                  <div className="p-4">
+                    <div className="flex items-center gap-3 pb-3 border-b border-gray-100">
+                      <img 
+                        src={getProfileImageUrl(user.profileImageUrl, user.username)}
+                        alt="Profile"
+                        className="w-12 h-12 rounded-full object-cover"
+                        onError={(e) => {
+                          e.target.src = `https://placehold.co/48x48/60a5fa/fff?text=${user.username.charAt(0)}`;
+                        }}
+                      />
+                      <div>
+                        <div className="font-semibold text-gray-900">{user.username}</div>
+                        <div className="text-sm text-gray-500">{user.bio || 'Developer'}</div>
+                      </div>
+                    </div>
+                    
+                    <div className="py-2 space-y-1">
+                      <Link to={`/profile/${user.username}`} className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors duration-200">
+                        <i className="fas fa-user w-4"></i>
+                        <span className="text-sm">View Profile</span>
+                      </Link>
+                      <Link to="/profile/edit" className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-green-50 hover:text-green-600 rounded-lg transition-colors duration-200">
+                        <i className="fas fa-cog w-4"></i>
+                        <span className="text-sm">Settings</span>
+                      </Link>
+                      <button className="w-full flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-purple-50 hover:text-purple-600 rounded-lg transition-colors duration-200">
+                        <i className="fas fa-moon w-4"></i>
+                        <span className="text-sm">Dark Mode</span>
+                      </button>
+                    </div>
+                    
+                    <div className="pt-2 border-t border-gray-100">
+                      <button 
+                        onClick={handleLogout}
+                        className="w-full flex items-center gap-3 px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
+                      >
+                        <i className="fas fa-sign-out-alt w-4"></i>
+                        <span className="text-sm">Logout</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </>
           )}
           
