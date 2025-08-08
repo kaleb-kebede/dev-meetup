@@ -11,6 +11,8 @@ const EditProfilePage = () => {
   const navigate = useNavigate();
   
   const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
     bio: '',
     skills: '',
   });
@@ -20,6 +22,8 @@ const EditProfilePage = () => {
   useEffect(() => {
     if (user) {
       setFormData({
+        firstName: user.firstName || '',
+        lastName: user.lastName || '',
         bio: user.bio || '',
         skills: user.skills ? user.skills.join(', ') : '',
       });
@@ -36,6 +40,20 @@ const EditProfilePage = () => {
 
   const onSubmit = async (e) => {
     e.preventDefault();
+
+    const firstName = (formData.firstName || '').trim();
+    const lastName = (formData.lastName || '').trim();
+
+    if (!firstName || !lastName) {
+      toast.error('Please provide both first and last name.');
+      return;
+    }
+
+    if (firstName.length > 50 || lastName.length > 50) {
+      toast.error('Names must be 50 characters or fewer.');
+      return;
+    }
+
     try {
       let imageUrl = user.profileImageUrl;
 
@@ -49,8 +67,13 @@ const EditProfilePage = () => {
       }
 
       const updatedTextData = {
-        bio: formData.bio,
-        skills: formData.skills.split(',').map(skill => skill.trim()).filter(Boolean),
+        firstName,
+        lastName,
+        bio: (formData.bio || '').trim(),
+        skills: (formData.skills || '')
+          .split(',')
+          .map(skill => skill.trim())
+          .filter(Boolean),
       };
 
       const textDataPromise = api.put('/users/profile', updatedTextData);
@@ -85,15 +108,63 @@ const EditProfilePage = () => {
           {/* Left Column - Profile Form */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-              <div className="flex items-center mb-6">
+              <div className="flex items-center mb-2">
                 <div className="w-10 h-10 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-lg flex items-center justify-center mr-4">
                   <i className="fas fa-user-edit text-white"></i>
                 </div>
-                <h1 className="text-2xl font-bold text-gray-900">Edit Profile</h1>
+                <div>
+                  <h1 className="text-2xl font-bold text-gray-900">Edit Profile</h1>
+                  <p className="text-sm text-gray-500">
+                    {(formData.firstName || user?.firstName || '').trim()} {(formData.lastName || user?.lastName || '').trim()} <span className="text-gray-400">•</span> @{user?.username}
+                  </p>
+                </div>
               </div>
               
               <form onSubmit={onSubmit}>
                 <div className="space-y-6">
+                  {/* Name */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Name
+                    </label>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label htmlFor="firstName" className="sr-only">First name</label>
+                        <div className="relative">
+                          <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+                            <i className="fas fa-user"></i>
+                          </span>
+                          <input
+                            type="text"
+                            id="firstName"
+                            name="firstName"
+                            value={formData.firstName}
+                            onChange={onChange}
+                            placeholder="First name"
+                            className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label htmlFor="lastName" className="sr-only">Last name</label>
+                        <div className="relative">
+                          <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+                            <i className="fas fa-id-card"></i>
+                          </span>
+                          <input
+                            type="text"
+                            id="lastName"
+                            name="lastName"
+                            value={formData.lastName}
+                            onChange={onChange}
+                            placeholder="Last name"
+                            className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">Use your real name so people can recognize you.</p>
+                  </div>
                   {/* Profile Picture */}
                   <div>
                     <label htmlFor="imageFile" className="block text-sm font-medium text-gray-700 mb-2">
@@ -210,7 +281,14 @@ const EditProfilePage = () => {
                     alt="Profile preview"
                     className="w-15 h-15 rounded-full mx-auto mb-3 object-cover"
                   />
-                  <h4 className="font-semibold text-gray-900">{user?.username}</h4>
+                  <h4 className="font-semibold text-gray-900">
+                    {(formData.firstName || user?.firstName) || (formData.lastName || user?.lastName) ? (
+                      <>
+                        {(formData.firstName || user?.firstName) || ''} {(formData.lastName || user?.lastName) || ''}
+                      </>
+                    ) : user?.username}
+                  </h4>
+                  <p className="text-xs text-gray-500">@{user?.username}</p>
                   {formData.bio && (
                     <p className="text-sm text-gray-600 mt-2 line-clamp-3">{formData.bio}</p>
                   )}

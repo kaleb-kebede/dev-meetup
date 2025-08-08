@@ -4,7 +4,7 @@ import Post from '../models/Post.js';
 // Get all users for suggestions with current user's following info
 export const getAllUsers = async (req, res) => {
   try {
-    const users = await User.find({}, 'username bio profileImageUrl createdAt')
+    const users = await User.find({}, 'username firstName lastName bio profileImageUrl createdAt')
       .sort({ createdAt: -1 })
       .limit(50); // Limit to prevent performance issues
 
@@ -42,6 +42,8 @@ export const getUserProfile = async (req, res) => {
       profile: {
         _id: user._id,
         username: user.username,
+        firstName: user.firstName,
+        lastName: user.lastName,
         email: user.email,
         bio: user.bio,
         skills: user.skills,
@@ -104,14 +106,22 @@ export const updateUserProfile = async (req, res) => {
     const user = await User.findById(req.user.id);
 
     if (user) {
-      user.bio = req.body.bio || user.bio;
-      user.skills = req.body.skills || user.skills;
+      const firstName = typeof req.body.firstName === 'string' ? req.body.firstName.trim() : undefined;
+      const lastName = typeof req.body.lastName === 'string' ? req.body.lastName.trim() : undefined;
+
+      if (firstName !== undefined) user.firstName = firstName;
+      if (lastName !== undefined) user.lastName = lastName;
+
+      user.bio = req.body.bio ?? user.bio;
+      user.skills = Array.isArray(req.body.skills) ? req.body.skills : (req.body.skills ?? user.skills);
       
       const updatedUser = await user.save();
 
       res.json({
         _id: updatedUser._id,
         username: updatedUser.username,
+        firstName: updatedUser.firstName,
+        lastName: updatedUser.lastName,
         email: updatedUser.email,
         bio: updatedUser.bio,
         skills: updatedUser.skills,
@@ -154,12 +164,15 @@ export const updateProfilePicture = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    user.profileImageUrl = req.body.profileImageUrl;
+    const newUrl = req.body.imageUrl || req.body.profileImageUrl || '';
+    user.profileImageUrl = newUrl;
     await user.save();
 
     res.json({
       _id: user._id,
       username: user.username,
+      firstName: user.firstName,
+      lastName: user.lastName,
       email: user.email,
       bio: user.bio,
       skills: user.skills,
