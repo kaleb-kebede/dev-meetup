@@ -6,7 +6,7 @@ import Header from '../components/Header';
 import MobileNav from '../components/MobileNav';
 import { Link } from 'react-router-dom';
 
-export default function MessagingPage() {
+export default function DevTerminalMessaging() {
   const { user: currentUser } = useAuth();
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -588,4 +588,4 @@ export default function MessagingPage() {
       <MobileNav />
     </div>
   );
-} 
+}
