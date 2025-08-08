@@ -13,6 +13,12 @@ import SearchPage from './pages/SearchPage';
 import MessagingPage from './pages/MessagingPage';
 import ThemeTest from './components/ThemeTest';
 import DarkModeSummary from './components/DarkModeSummary';
+import CreatePostPage from './pages/CreatePostPage';
+import NetworkPage from './pages/NetworkPage';
+import ProjectsPage from './pages/ProjectsPage';
+import ChallengesPage from './pages/ChallengesPage';
+import NotificationsPage from './pages/NotificationsPage';
+import AnalyticsPage from './pages/AnalyticsPage';
 import { useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import ThemeToggleButton from './components/ThemeToggleButton';
@@ -38,6 +44,12 @@ function App() {
         <Route path="/profile/:username" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
         <Route path="/profile/edit" element={<ProtectedRoute><EditProfilePage /></ProtectedRoute>} />
         <Route path="/search" element={<ProtectedRoute><SearchPage /></ProtectedRoute>} />
+        <Route path="/create" element={<ProtectedRoute><CreatePostPage /></ProtectedRoute>} />
+        <Route path="/network" element={<ProtectedRoute><NetworkPage /></ProtectedRoute>} />
+        <Route path="/projects" element={<ProtectedRoute><ProjectsPage /></ProtectedRoute>} />
+        <Route path="/challenges" element={<ProtectedRoute><ChallengesPage /></ProtectedRoute>} />
+        <Route path="/notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
+        <Route path="/analytics" element={<ProtectedRoute><AnalyticsPage /></ProtectedRoute>} />
 
         {/* Set up routes for logged-out users */}
         <Route path="/welcome" element={<WelcomePage />} />
