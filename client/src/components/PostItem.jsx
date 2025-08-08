@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import CommentSection from './CommentSection';
 import CodeSnippet from './CodeSnippet';
+import ShareMenu from './ShareMenu';
 import toast from 'react-hot-toast';
 import { getProfileImageUrl, getPostImageUrl } from '../utils/imageUtils';
 
@@ -320,14 +321,13 @@ const PostItem = ({ post, onLike, onCommentAdded, onToggleComments, isCommentsOp
             <i className="fas fa-retweet text-gray-400"></i>
             <span>fork</span>
           </button>
-          <button 
-            onClick={handleSend}
-            disabled={!user}
-            className="flex items-center justify-center gap-2 py-3 text-gray-600 hover:text-orange-600 hover:bg-orange-50 transition-all duration-200 font-mono text-sm"
-          >
-            <i className="fas fa-share text-gray-400"></i>
-            <span>share</span>
-          </button>
+          {/* Share Menu: developer-friendly */}
+          <ShareMenu 
+            postId={post._id}
+            post={post}
+            codeSnippet={post.codeSnippet}
+            getPostUrl={(id) => `${window.location.origin}/posts/${id}`}
+          />
         </div>
       </div>
 
