@@ -45,9 +45,9 @@ export default function Header() {
       <div className="flex items-center justify-between">
         {/* Left: Logo + Search */}
         <div className="flex items-center gap-4">
-          <Link to="/" className="flex items-center space-x-2">
+          <Link to="/home" className="flex items-center space-x-2">
             <div className="w-9 h-9 bg-gradient-to-r from-blue-500 to-blue-600 rounded flex items-center justify-center">
-              <span className="text-white font-bold text-sm">in</span>
+              <span className="text-white font-bold text-sm">dm</span>
             </div>
           </Link>
           <form onSubmit={handleSearch} className="relative hidden sm:block">

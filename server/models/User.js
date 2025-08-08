@@ -44,6 +44,101 @@ const UserSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
   }],
+  // --- NEW FIELDS FOR GITHUB INTEGRATION ---
+  githubData: {
+    username: {
+      type: String,
+      default: ''
+    },
+    profileUrl: {
+      type: String,
+      default: ''
+    },
+    avatarUrl: {
+      type: String,
+      default: ''
+    },
+    bio: {
+      type: String,
+      default: ''
+    },
+    publicRepos: {
+      type: Number,
+      default: 0
+    },
+    followers: {
+      type: Number,
+      default: 0
+    },
+    following: {
+      type: Number,
+      default: 0
+    },
+    location: {
+      type: String,
+      default: ''
+    },
+    company: {
+      type: String,
+      default: ''
+    },
+    blog: {
+      type: String,
+      default: ''
+    },
+    createdAt: {
+      type: Date
+    },
+    updatedAt: {
+      type: Date
+    }
+  },
+  githubRepositories: [{
+    id: Number,
+    name: String,
+    fullName: String,
+    description: String,
+    htmlUrl: String,
+    language: String,
+    stargazersCount: Number,
+    forksCount: Number,
+    size: Number,
+    defaultBranch: String,
+    createdAt: Date,
+    updatedAt: Date,
+    pushedAt: Date,
+    topics: [String],
+    isPinned: {
+      type: Boolean,
+      default: false
+    }
+  }],
+  githubStats: {
+    totalCommits: {
+      type: Number,
+      default: 0
+    },
+    totalStars: {
+      type: Number,
+      default: 0
+    },
+    totalForks: {
+      type: Number,
+      default: 0
+    },
+    primaryLanguages: [{
+      language: String,
+      percentage: Number
+    }],
+    contributionGraph: {
+      type: Map,
+      of: Number,
+      default: new Map()
+    },
+    lastSynced: {
+      type: Date
+    }
+  },
     // --- NEW FIELDS FOR PASSWORD RESET ---
   passwordResetToken: String,
   passwordResetExpires: Date,
