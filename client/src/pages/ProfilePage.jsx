@@ -7,6 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import Spinner from '../components/Spinner';
 import GitHubCard from '../components/GitHubCard';
 import { getProfileImageUrl } from '../utils/imageUtils';
+import { getFullName, getHandle } from '../utils/userUtils';
 
 const ProfilePage = () => {
   const { username } = useParams();
@@ -120,7 +121,7 @@ const ProfilePage = () => {
             <div className="relative inline-block">
               <img 
                 src={getProfileImageUrl(profile.profileImageUrl, profile.username)}
-                alt={`${profile.username}'s profile`}
+                alt={`${getFullName(profile)}'s profile`}
                 className="w-40 h-40 rounded-full ring-6 ring-white/50 shadow-2xl object-cover mx-auto"
               />
               {isOwnProfile && (
@@ -135,9 +136,10 @@ const ProfilePage = () => {
               )}
             </div>
             
-            <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-indigo-800 bg-clip-text text-transparent mt-6 mb-4">
-              {profile.username}
+            <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-indigo-800 bg-clip-text text-transparent mt-6">
+              {getFullName(profile)}
             </h1>
+            <div className="text-lg text-gray-500 mb-4">{getHandle(profile)}</div>
             
             <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-6 leading-relaxed">
               {profile.bio || 'Professional Developer & Tech Enthusiast'}

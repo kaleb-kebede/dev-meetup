@@ -3,6 +3,7 @@ import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 import { getProfileImageUrl } from '../utils/imageUtils';
+import { getFullName, getHandle } from '../utils/userUtils';
 
 // A single, recursive component for comments and their replies
 const CommentItem = ({ comment, postId, onReplyAdded, depth = 0 }) => {
@@ -12,8 +13,10 @@ const CommentItem = ({ comment, postId, onReplyAdded, depth = 0 }) => {
   const [isSubmittingReply, setIsSubmittingReply] = useState(false);
   const replyTextareaRef = useRef(null);
 
-  const authorUsername = comment.user?.username || 'User';
+  const authorUsername = comment.user?.username || 'user';
   const authorProfileImg = getProfileImageUrl(comment.user?.profileImageUrl, authorUsername);
+  const authorName = getFullName(comment.user) || authorUsername;
+  const authorHandle = getHandle(comment.user);
   const isCurrentUser = user?._id === comment.user?._id;
   const maxDepth = 3; // Limit nesting depth
 
@@ -79,12 +82,12 @@ const CommentItem = ({ comment, postId, onReplyAdded, depth = 0 }) => {
         {/* Comment Content */}
         <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 border border-gray-200 dark:border-gray-600">
           <div className="flex items-center justify-between mb-2">
-            <span className="font-semibold text-gray-900 dark:text-white text-sm">
-              {authorUsername}
-            </span>
-            <span className="text-xs text-gray-500 dark:text-gray-400">
-              {formatDate(comment.createdAt)} ago
-            </span>
+            span className="font-semibold text-gray-900 dark:text-white text-sm"
+              {authorName}
+            /span
+            span className="text-xs text-gray-500 dark:text-gray-400"
+              {authorHandle} • {formatDate(comment.createdAt)} ago
+            /span
           </div>
           <p className="text-gray-800 dark:text-gray-200 text-sm leading-relaxed">
             {comment.content}

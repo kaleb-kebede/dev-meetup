@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { getProfileImageUrl } from '../utils/imageUtils';
+import { getFullName, getHandle } from '../utils/userUtils';
 import api from '../services/api';
 
 function NavItem({ icon, label, active, to, color = 'blue' }) {
@@ -439,8 +440,9 @@ export default function Header() {
                         }}
                       />
                       <div>
-                        <div className={`font-semibold ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>{user.username}</div>
-                        <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>{user.bio || 'Developer'}</div>
+                      <div className={`font-semibold ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>{getFullName(user)}</div>
+                      <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>{getHandle(user)}</div>
+                      <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>{user.bio || 'Developer'}</div>
                         {githubStatus.connected && (
                           <div className="flex items-center gap-1 mt-1">
                             <i className="fab fa-github text-xs text-green-500"></i>

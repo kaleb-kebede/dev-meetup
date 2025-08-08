@@ -8,6 +8,7 @@ import CodeSnippet from './CodeSnippet';
 import ShareMenu from './ShareMenu';
 import toast from 'react-hot-toast';
 import { getProfileImageUrl, getPostImageUrl } from '../utils/imageUtils';
+import { getFullName, getHandle } from '../utils/userUtils';
 
 const PostItem = ({ post, onLike, onCommentAdded, onToggleComments, isCommentsOpen, onDelete, onUpdate }) => {
   const { user } = useAuth();
@@ -91,13 +92,15 @@ const PostItem = ({ post, onLike, onCommentAdded, onToggleComments, isCommentsOp
               />
             </Link>
             <div className="flex-1">
-              <div className="flex items-center gap-2">
-                <Link to={`/profile/${post.user.username}`} className="font-semibold text-gray-900 hover:text-blue-600 transition-colors duration-200 font-mono">
-                  {post.user.username}
-                </Link>
-                <span className="text-gray-400 font-mono text-sm">@devmeetup</span>
-                <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
-                <span className="text-sm text-gray-500 font-mono">{formatDate(post.createdAt)}</span>
+              <div className="flex flex-col">
+                <div className="flex items-center gap-2">
+                  <Link to={`/profile/${post.user.username}`} className="font-semibold text-gray-900 hover:text-blue-600 transition-colors duration-200 font-mono">
+                    {getFullName(post.user)}
+                  </Link>
+                  <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
+                  <span className="text-sm text-gray-500 font-mono">{formatDate(post.createdAt)}</span>
+                </div>
+                <span className="text-gray-400 font-mono text-sm">{getHandle(post.user)}</span>
               </div>
               <div className="text-xs text-gray-500 mt-1 font-mono">
                 <i className="fas fa-terminal text-gray-400 mr-1"></i>

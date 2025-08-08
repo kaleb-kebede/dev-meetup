@@ -1,6 +1,7 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
 import { getProfileImageUrl } from '../utils/imageUtils';
+import { getFullName, getHandle } from '../utils/userUtils';
 
 export default function ProfileCard() {
   const { user } = useAuth();
@@ -44,7 +45,8 @@ export default function ProfileCard() {
         
         {/* Profile Info */}
         <div className="mt-3 text-center">
-          <h3 className="font-bold text-xl text-gray-900">{user.username}</h3>
+          <h3 className="font-bold text-xl text-gray-900">{getFullName(user)}</h3>
+          <div className="text-sm text-gray-500">{getHandle(user)}</div>
           <p className="text-sm text-gray-600 mt-1 leading-relaxed">
             {user.bio || 'Software Developer'}
           </p>
