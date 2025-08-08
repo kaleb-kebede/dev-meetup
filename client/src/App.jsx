@@ -13,7 +13,6 @@ import SearchPage from './pages/SearchPage';
 import MessagingPage from './pages/MessagingPage';
 import ThemeTest from './components/ThemeTest';
 import DarkModeSummary from './components/DarkModeSummary';
-import ThemeVerifier from './components/ThemeVerifier';
 import { useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import ThemeToggleButton from './components/ThemeToggleButton';
@@ -50,8 +49,6 @@ function App() {
         <Route path="/reset-password/:resettoken" element={<ResetPasswordPage />} />
       </Routes>
 
-      {/* Theme Verifier - Temporary for testing */}
-      <ThemeVerifier />
     </div>
   );
 }
