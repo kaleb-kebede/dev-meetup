@@ -255,19 +255,19 @@ export default function MessagingPage() {
   };
 
   return (
-    <div className={`h-screen flex flex-col ${theme === 'dark' ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-900'} overflow-hidden`}>
+    <div className={`h-screen flex flex-col ${theme === 'dark' ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-900'}`}>
       {/* Header */}
       <Header />
       
-      {/* Main Content */}
-      <div className="flex-1 max-w-7xl mx-auto w-full p-4 overflow-hidden">
-        <div className="grid grid-cols-12 gap-4 h-full">
+      {/* Main Content - Fixed height container */}
+      <div className="flex-1 max-w-7xl mx-auto w-full p-4 flex overflow-hidden">
+        <div className="w-full h-full flex gap-4">
           
-          {/* Left Panel - User Selection */}
-          <div className="col-span-12 md:col-span-3 h-full flex flex-col">
-            <div className={`${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg border shadow-sm h-full flex flex-col overflow-hidden`}>
-              {/* Terminal-style header */}
-              <div className="bg-gray-900 text-white p-3 flex justify-between items-center">
+          {/* Left Panel - User Selection - Fixed width and height */}
+          <div className="w-80 h-full flex-shrink-0">
+            <div className={`${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg border shadow-sm h-full flex flex-col`}>
+              {/* Terminal-style header - Fixed */}
+              <div className="bg-gray-900 text-white p-3 flex justify-between items-center flex-shrink-0">
                 <div className="flex space-x-2">
                   <div className="w-3 h-3 bg-red-500 rounded-full"></div>
                   <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
@@ -276,8 +276,8 @@ export default function MessagingPage() {
                 <span className="text-xs font-mono">developers.list</span>
               </div>
               
-              {/* Search input */}
-              <div className="p-3 border-b border-gray-700">
+              {/* Search input - Fixed */}
+              <div className="p-3 border-b border-gray-700 flex-shrink-0">
                 <div className="flex items-center bg-gray-700 rounded-md px-3 py-2">
                   <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -292,7 +292,7 @@ export default function MessagingPage() {
                 </div>
               </div>
               
-              {/* User list */}
+              {/* User list - Scrollable area only */}
               <div className="flex-1 overflow-y-auto p-1 font-mono text-sm">
                 {loading ? (
                   <div className="p-3">
@@ -339,19 +339,19 @@ export default function MessagingPage() {
                 )}
               </div>
               
-              {/* Status bar */}
-              <div className="p-2 border-t border-gray-700 bg-gray-800 text-gray-400 text-xs font-mono flex justify-between">
+              {/* Status bar - Fixed at bottom */}
+              <div className="p-2 border-t border-gray-700 bg-gray-800 text-gray-400 text-xs font-mono flex justify-between flex-shrink-0">
                 <span>{filteredUsers.length} developers</span>
                 <span>{onlineUsers.size} online</span>
               </div>
             </div>
           </div>
           
-          {/* Main Terminal Chat Area */}
-          <div className="col-span-12 md:col-span-9 h-full flex flex-col">
-            <div className={`${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg border shadow-sm h-full flex flex-col overflow-hidden`}>
-              {/* Terminal header */}
-              <div className="bg-gray-900 p-3 flex justify-between items-center">
+          {/* Main Terminal Chat Area - Flex remaining space */}
+          <div className="flex-1 h-full">
+            <div className={`${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg border shadow-sm h-full flex flex-col`}>
+              {/* Terminal header - Fixed */}
+              <div className="bg-gray-900 p-3 flex justify-between items-center flex-shrink-0">
                 <div className="flex space-x-2">
                   <div className="w-3 h-3 bg-red-500 rounded-full"></div>
                   <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
@@ -383,9 +383,9 @@ export default function MessagingPage() {
                 </div>
               </div>
               
-              {/* Connection info bar */}
+              {/* Connection info bar - Fixed */}
               {selectedUser && (
-                <div className={`px-4 py-2 ${theme === 'dark' ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-700'} font-mono text-xs flex items-center`}>
+                <div className={`px-4 py-2 ${theme === 'dark' ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-700'} font-mono text-xs flex items-center flex-shrink-0`}>
                   <div className={`w-2 h-2 ${onlineUsers.has(selectedUser._id) ? 'bg-green-500' : 'bg-red-500'} rounded-full mr-2`}></div>
                   <span>
                     {onlineUsers.has(selectedUser._id) 
@@ -395,10 +395,10 @@ export default function MessagingPage() {
                 </div>
               )}
               
-              {/* Messages area */}
+              {/* Messages area - Properly constrained scrolling */}
               <div 
                 className={`flex-1 overflow-y-auto p-4 ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'} font-mono`}
-                style={{ fontSize: `${fontSize}px` }}
+                style={{ fontSize: `${fontSize}px`, minHeight: 0 }}
               >
                 {selectedUser ? (
                   <>
@@ -493,9 +493,9 @@ export default function MessagingPage() {
                 )}
               </div>
               
-              {/* Code editor (hidden by default) */}
+              {/* Code editor (hidden by default) - Fixed positioning */}
               {showCodeEditor && selectedUser && (
-                <div className={`p-4 border-t ${theme === 'dark' ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-gray-100'}`}>
+                <div className={`p-4 border-t ${theme === 'dark' ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-gray-100'} flex-shrink-0`}>
                   <div className="flex justify-between items-center mb-2">
                     <div className="text-xs font-mono text-gray-400">Code Snippet Editor</div>
                     <button 
@@ -509,7 +509,7 @@ export default function MessagingPage() {
                     <textarea
                       value={codeSnippet}
                       onChange={handleCodeSnippetChange}
-                      className={`w-full h-40 ${theme === 'dark' ? 'bg-gray-900 text-green-400' : 'bg-white text-gray-800'} font-mono text-sm p-3 rounded-md border ${theme === 'dark' ? 'border-gray-700' : 'border-gray-300'}`}
+                      className={`w-full h-32 ${theme === 'dark' ? 'bg-gray-900 text-green-400' : 'bg-white text-gray-800'} font-mono text-sm p-3 rounded-md border ${theme === 'dark' ? 'border-gray-700' : 'border-gray-300'} resize-none`}
                     />
                     <div className="flex justify-between">
                       <select 
@@ -533,9 +533,9 @@ export default function MessagingPage() {
                 </div>
               )}
               
-              {/* Message input */}
+              {/* Message input - Fixed at bottom */}
               {selectedUser && (
-                <div className={`p-3 ${theme === 'dark' ? 'border-t border-gray-700 bg-gray-800' : 'border-t border-gray-200 bg-white'}`}>
+                <div className={`p-3 ${theme === 'dark' ? 'border-t border-gray-700 bg-gray-800' : 'border-t border-gray-200 bg-white'} flex-shrink-0`}>
                   <form onSubmit={handleSendMessage} className="flex items-center space-x-2">
                     <div className={`flex-1 ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-100'} rounded-md px-3 py-2 flex items-center`}>
                       <span className={`font-mono ${theme === 'dark' ? 'text-green-400' : 'text-gray-500'} mr-2`}>$</span>
@@ -554,7 +554,7 @@ export default function MessagingPage() {
                       <button
                         type="button"
                         onClick={() => setShowCodeEditor(!showCodeEditor)}
-                        className={`${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'} p-2 rounded-md`}
+                        className={`${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'} p-2 rounded-md flex-shrink-0`}
                         title="Code Snippet"
                       >
                         <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -568,7 +568,7 @@ export default function MessagingPage() {
                           !newMessage.trim() || sending
                             ? 'bg-gray-600 cursor-not-allowed'
                             : 'bg-blue-600 hover:bg-blue-700'
-                        } text-white px-4 py-2 rounded-md font-mono text-sm transition-colors duration-200`}
+                        } text-white px-4 py-2 rounded-md font-mono text-sm transition-colors duration-200 flex-shrink-0`}
                       >
                         {sending ? 'Sending...' : 'Execute'}
                       </button>
