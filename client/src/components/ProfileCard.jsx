@@ -67,32 +67,42 @@ export default function ProfileCard() {
         </div>
       </div>
       
-      {/* Stats Section */}
+      {/* Dev Stats Section */}
       <div className="border-t border-gray-100/50 bg-gray-50/30 px-4 py-3">
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          <div className="text-center">
-            <div className="font-bold text-lg text-gray-900">156</div>
-            <div className="text-gray-600 text-xs">Profile views</div>
-          </div>
-          <div className="text-center">
-            <div className="font-bold text-lg text-gray-900">23</div>
-            <div className="text-gray-600 text-xs">Post impressions</div>
-          </div>
-        </div>
-        
-        {/* GitHub Stats if connected */}
-        {user.githubStats && (
-          <div className="mt-3 pt-3 border-t border-gray-200/50">
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-gray-600 flex items-center">
-                <i className="fab fa-github mr-1"></i>
-                GitHub Stars
-              </span>
-              <span className="font-semibold text-blue-600">{user.githubStats.totalStars || 0}</span>
+        <div className="grid grid-cols-3 gap-3 text-center">
+          <div>
+            <div className="text-xs text-gray-500 flex items-center justify-center gap-1">
+              <i className="fab fa-github" /> Repos
+            </div>
+            <div className="font-bold text-lg text-gray-900">
+              {user.githubData?.publicRepos ?? 0}
             </div>
           </div>
+          <div>
+            <div className="text-xs text-gray-500 flex items-center justify-center gap-1">
+              <i className="fas fa-star text-yellow-500" /> Stars
+            </div>
+            <div className="font-bold text-lg text-gray-900">
+              {user.githubStats?.totalStars ?? 0}
+            </div>
+          </div>
+          <div>
+            <div className="text-xs text-gray-500 flex items-center justify-center gap-1">
+              <i className="fas fa-users text-green-500" /> Followers
+            </div>
+            <div className="font-bold text-lg text-gray-900">
+              {user.followers?.length ?? 0}
+            </div>
+          </div>
+        </div>
+
+        {!user.githubData?.username && (
+          <div className="mt-3 text-xs text-gray-600 bg-white border border-dashed border-gray-300 rounded-lg p-3 flex items-center justify-between">
+            <span>Connect GitHub to unlock insights</span>
+            <a href="/profile/edit" className="px-2 py-1 rounded-md bg-blue-100 text-blue-700 hover:bg-blue-200">Connect</a>
+          </div>
         )}
-        
+
         {/* View Profile Link */}
         <div className="mt-3 pt-3 border-t border-gray-200/50">
           <a 
